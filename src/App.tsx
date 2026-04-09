@@ -1,0 +1,56 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import SearchByName from './pages/search/SearchByName';
+import SearchBySalt from './pages/search/SearchBySalt';
+import SearchByDisease from './pages/search/SearchByDisease';
+import CheapAlternatives from './pages/alternatives/CheapAlternatives';
+import BrandAlternatives from './pages/alternatives/BrandAlternatives';
+import SafeAlternatives from './pages/alternatives/SafeAlternatives';
+import PharmacyDirections from './pages/pharmacy/PharmacyDirections';
+import PharmacyCall from './pages/pharmacy/PharmacyCall';
+import PharmacyAvailability from './pages/pharmacy/PharmacyAvailability';
+import EmergencyPharmacy from './pages/emergency/EmergencyPharmacy';
+import EmergencyHospital from './pages/emergency/EmergencyHospital';
+import EmergencyMedicines from './pages/emergency/EmergencyMedicines';
+import EmergencyAmbulance from './pages/emergency/EmergencyAmbulance';
+import AskMedicine from './pages/ai/AskMedicine';
+import SymptomsCheck from './pages/ai/SymptomsCheck';
+import HealthAdvice from './pages/ai/HealthAdvice';
+import ScanMedicine from './pages/scanner/ScanMedicine';
+import ScanPrescription from './pages/scanner/ScanPrescription';
+import UploadMedicine from './pages/upload/UploadMedicine';
+import UploadPrescription from './pages/upload/UploadPrescription';
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <div className="min-h-screen bg-[#080c14]">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/search/name" element={<SearchByName />} />
+          <Route path="/search/salt" element={<SearchBySalt />} />
+          <Route path="/search/disease" element={<SearchByDisease />} />
+          <Route path="/alternatives/cheap" element={<CheapAlternatives />} />
+          <Route path="/alternatives/brand" element={<BrandAlternatives />} />
+          <Route path="/alternatives/safe" element={<SafeAlternatives />} />
+          <Route path="/pharmacy/directions" element={<PharmacyDirections />} />
+          <Route path="/pharmacy/call" element={<PharmacyCall />} />
+          <Route path="/pharmacy/availability" element={<PharmacyAvailability />} />
+          <Route path="/emergency/pharmacy" element={<EmergencyPharmacy />} />
+          <Route path="/emergency/hospital" element={<EmergencyHospital />} />
+          <Route path="/emergency/medicines" element={<EmergencyMedicines />} />
+          <Route path="/emergency/ambulance" element={<EmergencyAmbulance />} />
+          <Route path="/ai/medicine" element={<AskMedicine />} />
+          <Route path="/ai/symptoms" element={<SymptomsCheck />} />
+          <Route path="/ai/advice" element={<HealthAdvice />} />
+          <Route path="/scan/medicine" element={<ScanMedicine />} />
+          <Route path="/scan/prescription" element={<ScanPrescription />} />
+          <Route path="/upload/medicine" element={<UploadMedicine />} />
+          <Route path="/upload/prescription" element={<UploadPrescription />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
+}
