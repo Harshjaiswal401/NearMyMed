@@ -33,27 +33,27 @@ export default function CallPharmacy() {
       <div className="space-y-4">
         {pharmacies.map((ph) => (
           <Card key={ph.name} className="p-5 hover:border-blue-100 transition">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div className="flex items-start gap-3 flex-1 min-w-0">
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${ph.open ? 'bg-green-50' : 'bg-slate-100'}`}>
                   <Phone size={18} className={ph.open ? 'text-green-600' : 'text-slate-400'} />
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-bold text-slate-800 text-sm">{ph.name}</h3>
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${ph.open ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+                    <h3 className="font-bold text-slate-800 text-sm truncate">{ph.name}</h3>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${ph.open ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
                       {ph.open ? '● Open' : '● Closed'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1"><MapPin size={10} /> {ph.address} · {ph.dist}</p>
-                  <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><Clock size={10} /> {ph.hours}</p>
-                  <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><Star size={10} className="text-yellow-400 fill-yellow-400" /> {ph.rating}</p>
+                  <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1 truncate"><MapPin size={10} className="flex-shrink-0" /> <span className="truncate">{ph.address} · {ph.dist}</span></p>
+                  <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><Clock size={10} className="flex-shrink-0" /> {ph.hours}</p>
+                  <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><Star size={10} className="text-yellow-400 fill-yellow-400 flex-shrink-0" /> {ph.rating}</p>
                 </div>
               </div>
-              <div className="flex flex-col gap-2 flex-shrink-0">
+              <div className="flex flex-col gap-2 sm:items-end flex-shrink-0">
                 <a
                   href={`tel:${ph.phone}`}
-                  className={`flex items-center gap-1.5 text-xs font-bold px-5 py-2.5 rounded-xl transition ${
+                  className={`flex justify-center items-center gap-1.5 text-xs font-bold px-5 py-2.5 rounded-xl transition ${
                     ph.open
                       ? 'bg-green-600 text-white hover:bg-green-700 shadow-sm'
                       : 'bg-slate-100 text-slate-400 cursor-not-allowed'
@@ -61,7 +61,7 @@ export default function CallPharmacy() {
                 >
                   <PhoneCall size={13} /> {ph.phone}
                 </a>
-                <p className="text-center text-xs text-slate-400">{ph.open ? 'Tap to call' : 'Currently closed'}</p>
+                <p className="text-center sm:text-right text-xs text-slate-400">{ph.open ? 'Tap to call' : 'Currently closed'}</p>
               </div>
             </div>
           </Card>
