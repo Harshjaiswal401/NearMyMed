@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CreditCard, Truck, User, MapPin, Phone, Mail, CheckCircle, Shield, Package } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useOrderHistory } from '../../context/OrderHistoryContext';
 
 export default function CheckoutPage() {
   const { items, getCartTotal, getCartCount, clearCart } = useCart();
   const { isDark } = useTheme();
+  const { addOrder } = useOrderHistory();
   const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1: details, 2: confirm, 3: success
   const [form, setForm] = useState({
@@ -44,11 +46,30 @@ export default function CheckoutPage() {
   };
 
   const handleConfirm = () => {
+    const newOrderId = addOrder({
+      items: items.map(i => ({ ...i })),
+      subtotal: getCartTotal(),
+      deliveryFee,
+      total,
+      paymentMethod: form.paymentMethod,
+      deliveryAddress: {
+        fullName: form.fullName,
+        phone: form.phone,
+        email: form.email,
+        address1: form.address1,
+        address2: form.address2,
+        city: form.city,
+        state: form.state,
+        pinCode: form.pinCode,
+      },
+    });
+    setGeneratedOrderId(newOrderId);
     clearCart();
     setStep(3);
   };
 
-  const orderId = `NMM-${Date.now().toString(36).toUpperCase()}`;
+  const [generatedOrderId, setGeneratedOrderId] = useState('');
+  const orderId = generatedOrderId || `NMM-${Date.now().toString(36).toUpperCase()}`;
 
   const inputClass = `w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 transition ${isDark ? 'glass border border-white/10 text-white placeholder-slate-500 focus:ring-blue-500/40 focus:border-blue-500/30' : 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400 focus:ring-blue-500/30 focus:border-blue-400'}`;
   const labelClass = `block text-xs font-bold mb-2 ${isDark ? 'text-slate-400' : 'text-gray-600'}`;
@@ -83,7 +104,8 @@ export default function CheckoutPage() {
               </div>
             </div>
           </div>
-          <div className="flex gap-3 justify-center">
+          <div className="flex gap-3 justify-center flex-wrap">
+            <button onClick={() => navigate('/orders')} className="bg-violet-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-violet-500 transition text-sm">View Orders</button>
             <button onClick={() => navigate('/')} className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-500 transition text-sm">Back to Home</button>
             <button onClick={() => navigate('/search/name')} className={`px-8 py-3 rounded-xl font-bold text-sm transition border ${isDark ? 'glass border-white/10 text-slate-300 hover:text-white' : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'}`}>Continue Shopping</button>
           </div>

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { CartProvider } from './context/CartContext';
+import { OrderHistoryProvider } from './context/OrderHistoryContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import SearchByName from './pages/search/SearchByName';
@@ -28,6 +29,8 @@ import CartPage from './pages/cart/CartPage';
 import CheckoutPage from './pages/cart/CheckoutPage';
 import PreBookingPage from './pages/prebooking/PreBookingPage';
 import TalkToDoctor from './pages/doctor/TalkToDoctor';
+import OrderHistoryPage from './pages/orders/OrderHistoryPage';
+import OrderMorePage from './pages/orders/OrderMorePage';
 import EmergencyFab from './components/EmergencyFab';
 
 function AppContent() {
@@ -64,6 +67,9 @@ function AppContent() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/prebooking" element={<PreBookingPage />} />
         <Route path="/doctor" element={<TalkToDoctor />} />
+        {/* Order History & More */}
+        <Route path="/orders" element={<OrderHistoryPage />} />
+        <Route path="/order/:orderId/more" element={<OrderMorePage />} />
       </Routes>
       <EmergencyFab />
     </div>
@@ -74,9 +80,11 @@ export default function App() {
   return (
     <ThemeProvider>
       <CartProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
+        <OrderHistoryProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </OrderHistoryProvider>
       </CartProvider>
     </ThemeProvider>
   );

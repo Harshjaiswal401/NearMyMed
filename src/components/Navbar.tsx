@@ -6,6 +6,7 @@ import {
   ShieldCheck, MapPin, Phone, CheckCircle, Heart, Stethoscope,
   Syringe, Ambulance, MessageSquare, ClipboardList, Lightbulb,
   Camera, FileText, Menu, X, Home, Zap, ShoppingCart, Moon, Sun, Clock,
+  Package,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useCart } from '../context/CartContext';
@@ -291,6 +292,15 @@ export default function Navbar() {
               title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            {/* Orders History */}
+            <button
+              onClick={() => navigate('/orders')}
+              className={`relative p-2 rounded-xl transition ${isDark ? 'text-slate-400 hover:bg-white/8 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}
+              title="Order History"
+            >
+              <Package size={18} />
             </button>
 
             {/* Cart */}
