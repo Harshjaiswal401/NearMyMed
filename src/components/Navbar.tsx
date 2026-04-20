@@ -99,6 +99,15 @@ const navItems: NavItem[] = [
       { label: 'Upload Prescription', route: '/upload/prescription', icon: <FileText size={14} />, description: 'Digitize your prescription' },
     ],
   },
+  {
+    id: 'orders',
+    label: 'Orders',
+    icon: <Package size={15} />,
+    items: [
+      { label: 'Order History', route: '/orders', icon: <Package size={14} />, description: 'Track your recent orders' },
+      { label: 'Your Cart', route: '/cart', icon: <ShoppingCart size={14} />, description: 'View items ready for checkout' },
+    ],
+  },
 ];
 
 function DropdownMenu({ item, onNavigate }: { item: NavItem; onNavigate: () => void }) {
@@ -292,28 +301,6 @@ export default function Navbar() {
               title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-
-            {/* Orders History */}
-            <button
-              onClick={() => navigate('/orders')}
-              className={`relative p-2 rounded-xl transition ${isDark ? 'text-slate-400 hover:bg-white/8 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}
-              title="Order History"
-            >
-              <Package size={18} />
-            </button>
-
-            {/* Cart */}
-            <button
-              onClick={() => navigate('/cart')}
-              className={`relative p-2 rounded-xl transition ${isDark ? 'text-slate-400 hover:bg-white/8 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}
-            >
-              <ShoppingCart size={18} />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-count-up">
-                  {cartCount > 9 ? '9+' : cartCount}
-                </span>
-              )}
             </button>
 
             <button
