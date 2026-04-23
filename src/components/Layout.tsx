@@ -1,5 +1,7 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface PageLayoutProps {
   icon: React.ReactNode;
@@ -165,32 +167,95 @@ export function SearchBar({
 
 export function MapPlaceholder({ label = 'Map View' }: { label?: string }) {
   const { isDark } = useTheme();
+  const mapContainerRef = React.useRef<HTMLDivElement>(null);
+  const mapRef = React.useRef<L.Map | null>(null);
+  const [status, setStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = React.useState('');
+
+  const enableGPS = () => {
+    if (!navigator.geolocation) {
+      setStatus('error');
+      setErrorMsg('Geolocation is not supported by your browser.');
+      return;
+    }
+    setStatus('loading');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        setStatus('success');
+        if (mapContainerRef.current && !mapRef.current) {
+          const map = L.map(mapContainerRef.current).setView([latitude, longitude], 16);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+          }).addTo(map);
+          const icon = L.divIcon({
+            html: '<div style="width:18px;height:18px;background:#3b82f6;border:3px solid #fff;border-radius:50%;box-shadow:0 0 10px rgba(59,130,246,0.6)"></div>',
+            className: '',
+            iconSize: [18, 18],
+            iconAnchor: [9, 9],
+          });
+          L.marker([latitude, longitude], { icon }).addTo(map)
+            .bindPopup(`<b>📍 You are here</b><br/>Accuracy: ${Math.round(accuracy)}m`)
+            .openPopup();
+          L.circle([latitude, longitude], { radius: accuracy, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.1, weight: 1 }).addTo(map);
+          mapRef.current = map;
+          setTimeout(() => map.invalidateSize(), 200);
+        }
+      },
+      (err) => {
+        setStatus('error');
+        setErrorMsg(err.code === 1 ? 'Location permission denied. Please allow access.' : 'Unable to retrieve your location. Please try again.');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  React.useEffect(() => {
+    return () => {
+      if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
+    };
+  }, []);
+
+  if (status === 'success') {
+    return (
+      <div className="rounded-2xl overflow-hidden border border-blue-500/20">
+        <div ref={mapContainerRef} style={{ height: '400px', width: '100%' }} />
+      </div>
+    );
+  }
+
   return (
     <div className={`relative rounded-2xl overflow-hidden h-72 md:h-96 flex items-center justify-center ${isDark ? 'glass' : 'bg-white border border-gray-200 shadow-sm'}`}>
-      {/* Fake map grid */}
-      <div className={`absolute inset-0 opacity-30 ${isDark ? 'bg-dark-grid' : 'bg-dark-grid'}`} />
-      {/* Glowing roads */}
+      <div className={`absolute inset-0 opacity-30 bg-dark-grid`} />
       <div className="absolute inset-0">
         <div className={`absolute top-1/3 left-0 right-0 h-px ${isDark ? 'bg-blue-500/30' : 'bg-blue-300/40'}`} />
         <div className={`absolute top-2/3 left-0 right-0 h-px ${isDark ? 'bg-blue-500/20' : 'bg-blue-200/40'}`} />
         <div className={`absolute left-1/4 top-0 bottom-0 w-px ${isDark ? 'bg-blue-500/30' : 'bg-blue-300/40'}`} />
         <div className={`absolute left-3/4 top-0 bottom-0 w-px ${isDark ? 'bg-blue-500/20' : 'bg-blue-200/40'}`} />
       </div>
-      {/* Pings */}
       <div className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2">
         <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-blue-300 animate-pulse-blue shadow-lg" />
       </div>
       <div className="absolute top-2/3 left-3/4 -translate-x-1/2 -translate-y-1/2">
         <div className="w-4 h-4 bg-red-500 rounded-full border-2 border-red-300 animate-pulse-red shadow-lg" />
       </div>
-      {/* Center card */}
       <div className={`relative z-10 text-center rounded-2xl px-8 py-6 border ${isDark ? 'glass border-white/10' : 'bg-white/90 border-gray-200 shadow-md'}`}>
         <div className="text-4xl mb-3">🗺️</div>
         <p className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{label}</p>
-        <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Location services required</p>
-        <button className="mt-3 text-xs bg-blue-600 text-white px-5 py-2 rounded-xl font-semibold hover:bg-blue-500 transition shadow-lg neon-blue">
-          Enable GPS
-        </button>
+        {status === 'error' && <p className="text-xs text-red-400 mt-1">{errorMsg}</p>}
+        {status === 'loading' ? (
+          <div className="mt-3 flex items-center justify-center gap-2">
+            <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+            <span className={`text-xs ${isDark ? 'text-blue-300' : 'text-blue-600'}`}>Getting your location...</span>
+          </div>
+        ) : (
+          <>
+            <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Click to enable live GPS location</p>
+            <button onClick={enableGPS} className="mt-3 text-xs bg-blue-600 text-white px-5 py-2 rounded-xl font-semibold hover:bg-blue-500 transition shadow-lg neon-blue">
+              📍 Enable GPS
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -266,9 +331,7 @@ export function ChatUI() {
             Online · Always ready
           </p>
         </div>
-        <span className={`ml-auto text-xs px-3 py-1.5 rounded-full font-semibold border ${isDark ? 'bg-blue-500/15 text-blue-300 border-blue-500/25' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
-          GPT-Powered
-        </span>
+
       </div>
 
       {/* Messages */}

@@ -7,8 +7,6 @@ export default function AskMedicine() {
       icon={<Bot size={26} className="text-violet-400" />}
       title="Ask Medicine AI"
       subtitle="Get instant, AI-powered answers about medicines, drug interactions, dosages, and side effects."
-      badge="GPT-Powered"
-      badgeColor="purple"
       headerGradient="from-violet-600/15 via-indigo-500/5 to-transparent"
       accentColor="violet"
     >
