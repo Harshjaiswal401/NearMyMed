@@ -4,6 +4,7 @@ import { ArrowLeft, CreditCard, Truck, User, MapPin, Phone, Mail, CheckCircle, S
 import { useCart } from '../../context/CartContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useOrderHistory } from '../../context/OrderHistoryContext';
+import emailjs from "@emailjs/browser";
 
 export default function CheckoutPage() {
   const { items, getCartTotal, getCartCount, clearCart } = useCart();
@@ -29,8 +30,8 @@ export default function CheckoutPage() {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.fullName.trim()) e.fullName = 'Full name is required';
-    if (!form.phone.trim() || form.phone.length !== 10) e.phone = 'Phone number must be exactly 10 digits';
-    if (!form.email.trim() || !form.email.toLowerCase().endsWith('@gmail.com')) e.email = 'Please use a valid @gmail.com address.';
+    if (!form.phone.trim() || form.phone.length < 10) e.phone = 'Valid phone number required';
+    if (!form.email.trim() || !form.email.includes('@')) e.email = 'Valid email required';
     if (!form.age.trim()) e.age = 'Age is required';
     if (!form.gender) e.gender = 'Select gender';
     if (!form.address1.trim()) e.address1 = 'Address is required';
@@ -45,36 +46,83 @@ export default function CheckoutPage() {
     if (validate()) setStep(2);
   };
 
-  const handleConfirm = () => {
-    const newOrderId = addOrder({
-      items: items.map(i => ({ ...i })),
-      subtotal: getCartTotal(),
-      deliveryFee,
-      total,
-      paymentMethod: form.paymentMethod,
-      deliveryAddress: {
-        fullName: form.fullName,
-        phone: form.phone,
-        email: form.email,
-        address1: form.address1,
-        address2: form.address2,
-        city: form.city,
-        state: form.state,
-        pinCode: form.pinCode,
-      },
-    });
-    setGeneratedOrderId(newOrderId);
-    clearCart();
-    setStep(3);
-  };
+const handleConfirm = () => {
+  const newOrderId = addOrder({
+    items: items.map(i => ({ ...i })),
+    subtotal: getCartTotal(),
+    deliveryFee,
+    total,
+    paymentMethod: form.paymentMethod,
+    deliveryAddress: {
+      fullName: form.fullName,
+      phone: form.phone,
+      email: form.email,
+      address1: form.address1,
+      address2: form.address2,
+      city: form.city,
+      state: form.state,
+      pinCode: form.pinCode,
+    },
+  });
+
+  // 🔥 ONLY THIS LINE ADDED
+  sendEmails(newOrderId);
+
+  setGeneratedOrderId(newOrderId);
+  clearCart();
+  setStep(3);
+};
 
   const [generatedOrderId, setGeneratedOrderId] = useState('');
   const orderId = generatedOrderId || `NMM-${Date.now().toString(36).toUpperCase()}`;
 
   const inputClass = `w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 transition ${isDark ? 'glass border border-white/10 text-white placeholder-slate-500 focus:ring-blue-500/40 focus:border-blue-500/30' : 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400 focus:ring-blue-500/30 focus:border-blue-400'}`;
-  const selectClass = `w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 transition ${isDark ? 'bg-gray-800 border border-gray-700 text-white focus:ring-blue-500/40 focus:border-blue-500/30' : 'bg-white border border-gray-300 text-gray-900 focus:ring-blue-500/30 focus:border-blue-400'}`;
   const labelClass = `block text-xs font-bold mb-2 ${isDark ? 'text-slate-400' : 'text-gray-600'}`;
   const errorClass = 'text-xs text-red-400 mt-1';
+
+
+
+    // 🔥 EMAIL FUNCTION
+const generateItemsHTML = () => {
+  return items.map(item => `
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
+      <span>${item.name} × ${item.quantity}</span>
+      <span>₹${item.price * item.quantity}</span>
+    </div>
+  `).join('');
+};
+
+const sendEmails = (orderId: string) => {
+  const templateParams = {
+    user_name: form.fullName,
+    user_email: form.email, // IMPORTANT (for sending)
+    order_id: orderId,
+    total: total,
+    items_html: generateItemsHTML(), // 🔥 THIS IS NEW
+  };
+
+  // USER EMAIL
+  emailjs.send(
+    "service_yb3clca",
+    "template_q1zcqaq",
+    templateParams,
+    "-xTNLGloxlRg2ibDS"
+  ).then(() => {
+    console.log("User email sent");
+  }).catch(err => console.error("User email error:", err));
+
+  // ADMIN EMAIL
+  emailjs.send(
+    "service_yb3clca",
+    "template_9h1ixfv",
+    templateParams,
+    "-xTNLGloxlRg2ibDS"
+  ).then(() => {
+    console.log("Admin email sent");
+  }).catch(err => console.error("Admin email error:", err));
+};
+
+
 
   // ── SUCCESS ──
   if (step === 3) {
@@ -197,7 +245,7 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label className={labelClass}>Phone Number *</label>
-                  <input value={form.phone} onChange={e => { const val = e.target.value.replace(/\D/g, ''); setForm({ ...form, phone: val }); }} placeholder="10-digit mobile number" className={inputClass} type="tel" maxLength={10} />
+                  <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 XXXXX XXXXX" className={inputClass} type="tel" />
                   {errors.phone && <p className={errorClass}>{errors.phone}</p>}
                 </div>
                 <div>
@@ -212,7 +260,7 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label className={labelClass}>Gender *</label>
-                  <select value={form.gender} onChange={e => setForm({ ...form, gender: e.target.value })} className={selectClass}>
+                  <select value={form.gender} onChange={e => setForm({ ...form, gender: e.target.value })} className={inputClass}>
                     <option value="">Select Gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
