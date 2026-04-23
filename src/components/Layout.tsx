@@ -203,23 +203,51 @@ export function ChatUI() {
     { role: 'ai', text: "Hello! I'm MedAI, your personal healthcare assistant powered by advanced AI. How can I help you today?" },
   ]);
   const [input, setInput] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const { isDark } = useTheme();
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  // Function to send message to n8n AI
+  const sendMessageToAI = async (userMessage: string): Promise<string> => {
+    try {
+      const response = await fetch("https://harshg789.app.n8n.cloud/webhook/d6404487-3e08-4921-b58e-aa4cac78df21/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "sendMessage",
+          sessionId: "user-12345",
+          chatInput: userMessage,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("AI Doctor's Reply:", data.output);
+      return data.output;
+
+    } catch (error) {
+      console.error("Error connecting to MedAI:", error);
+      return "Sorry, server se connection toot gaya. Thodi der baad try karein.";
+    }
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
     const userMsg = { role: 'user', text: input };
-    const aiReply = {
-      role: 'ai',
-      text: `I understand you're asking about "${input}". Based on my comprehensive medical knowledge, I'm analyzing your query. For the best results, I recommend consulting a licensed healthcare professional for personalized medical advice.`,
-    };
-    setMessages((prev) => [...prev, userMsg, aiReply]);
+    setMessages((prev) => [...prev, userMsg]);
+    const userInput = input;
     setInput('');
+    setIsLoading(true);
+
+    const aiReplyText = await sendMessageToAI(userInput);
+    setMessages((prev) => [...prev, { role: 'ai', text: aiReplyText }]);
+    setIsLoading(false);
   };
 
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, isLoading]);
 
   return (
     <div className={`flex flex-col h-[520px] rounded-2xl border overflow-hidden ${isDark ? 'glass border-white/8' : 'bg-white border-gray-200 shadow-md'}`}>
@@ -260,6 +288,21 @@ export function ChatUI() {
             </div>
           </div>
         ))}
+        {/* Typing indicator */}
+        {isLoading && (
+          <div className="flex justify-start animate-fade-in">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-black mr-2 mt-0.5 flex-shrink-0">
+              AI
+            </div>
+            <div className={`px-4 py-3 rounded-2xl rounded-bl-sm text-sm ${isDark ? 'glass border border-white/8' : 'bg-gray-100 border border-gray-200'}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-blue-400' : 'bg-blue-500'}`} style={{ animationDelay: '0ms' }} />
+                <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-blue-400' : 'bg-blue-500'}`} style={{ animationDelay: '150ms' }} />
+                <span className={`w-2 h-2 rounded-full animate-bounce ${isDark ? 'bg-blue-400' : 'bg-blue-500'}`} style={{ animationDelay: '300ms' }} />
+              </div>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -270,14 +313,16 @@ export function ChatUI() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Type your health question..."
-          className={`flex-1 px-4 py-2.5 rounded-xl border text-sm focus:outline-none transition ${isDark ? 'glass border-white/10 text-white placeholder-slate-500 focus:border-blue-500/50' : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-400'}`}
+          placeholder={isLoading ? "Waiting for AI response..." : "Type your health question..."}
+          disabled={isLoading}
+          className={`flex-1 px-4 py-2.5 rounded-xl border text-sm focus:outline-none transition ${isDark ? 'glass border-white/10 text-white placeholder-slate-500 focus:border-blue-500/50' : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-400'} ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
         />
         <button
           onClick={handleSend}
-          className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-500 transition shadow-lg neon-blue"
+          disabled={isLoading}
+          className={`bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-500 transition shadow-lg neon-blue ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          Send
+          {isLoading ? '...' : 'Send'}
         </button>
       </div>
     </div>

@@ -25,6 +25,7 @@ export default function TalkToDoctor() {
   const consultLabels = { video: 'Video Call', audio: 'Audio Call', chat: 'Chat' };
 
   const inputClass = `w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 transition ${isDark ? 'glass border border-white/10 text-white placeholder-slate-500 focus:ring-blue-500/40' : 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400 focus:ring-blue-500/30'}`;
+  const selectClass = `w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 transition ${isDark ? 'bg-gray-800 border border-gray-700 text-white focus:ring-blue-500/40' : 'bg-white border border-gray-300 text-gray-900 focus:ring-blue-500/30'}`;
 
   const handleBooking = () => {
     if (form.name && form.phone && selectedSlot) setBookingStep(3);
@@ -168,7 +169,7 @@ export default function TalkToDoctor() {
               </div>
               <div>
                 <label className={`block text-xs font-bold mb-2 ${isDark ? 'text-slate-400' : 'text-gray-600'}`}>Gender</label>
-                <select value={form.gender} onChange={e => setForm({ ...form, gender: e.target.value })} className={inputClass}>
+                <select value={form.gender} onChange={e => setForm({ ...form, gender: e.target.value })} className={selectClass}>
                   <option value="">Select</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>

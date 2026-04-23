@@ -59,6 +59,7 @@ export default function PreBookingPage() {
   };
 
   const inputClass = `w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 transition ${isDark ? 'glass border border-white/10 text-white placeholder-slate-500 focus:ring-blue-500/40' : 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400 focus:ring-blue-500/30'}`;
+  const selectClass = `w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 transition ${isDark ? 'bg-gray-800 border border-gray-700 text-white focus:ring-blue-500/40' : 'bg-white border border-gray-300 text-gray-900 focus:ring-blue-500/30'}`;
 
   // ── SUCCESS ──
   if (step === 3) {
@@ -180,7 +181,7 @@ export default function PreBookingPage() {
                 <FileText size={18} className={isDark ? 'text-orange-400' : 'text-orange-500'} />
                 <h3 className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Reason for Emergency *</h3>
               </div>
-              <select value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value })} className={inputClass + ' mb-3'}>
+              <select value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value })} className={selectClass + ' mb-3'}>
                 <option value="">Select reason...</option>
                 {emergencyReasons.map(r => <option key={r} value={r}>{r}</option>)}
               </select>

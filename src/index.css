@@ -79,6 +79,17 @@
   html.dark input, html.dark textarea, html.dark select {
     color-scheme: dark;
   }
+
+  /* Fix dark mode dropdown options */
+  html.dark select option {
+    background-color: #1e293b;
+    color: #e2e8f0;
+  }
+
+  html.light select option {
+    background-color: #ffffff;
+    color: #1f2937;
+  }
 }
 
 @layer utilities {

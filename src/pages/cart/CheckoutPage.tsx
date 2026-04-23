@@ -29,8 +29,8 @@ export default function CheckoutPage() {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.fullName.trim()) e.fullName = 'Full name is required';
-    if (!form.phone.trim() || form.phone.length < 10) e.phone = 'Valid phone number required';
-    if (!form.email.trim() || !form.email.includes('@')) e.email = 'Valid email required';
+    if (!form.phone.trim() || form.phone.length !== 10) e.phone = 'Phone number must be exactly 10 digits';
+    if (!form.email.trim() || !form.email.toLowerCase().endsWith('@gmail.com')) e.email = 'Please use a valid @gmail.com address.';
     if (!form.age.trim()) e.age = 'Age is required';
     if (!form.gender) e.gender = 'Select gender';
     if (!form.address1.trim()) e.address1 = 'Address is required';
@@ -72,6 +72,7 @@ export default function CheckoutPage() {
   const orderId = generatedOrderId || `NMM-${Date.now().toString(36).toUpperCase()}`;
 
   const inputClass = `w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 transition ${isDark ? 'glass border border-white/10 text-white placeholder-slate-500 focus:ring-blue-500/40 focus:border-blue-500/30' : 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400 focus:ring-blue-500/30 focus:border-blue-400'}`;
+  const selectClass = `w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 transition ${isDark ? 'bg-gray-800 border border-gray-700 text-white focus:ring-blue-500/40 focus:border-blue-500/30' : 'bg-white border border-gray-300 text-gray-900 focus:ring-blue-500/30 focus:border-blue-400'}`;
   const labelClass = `block text-xs font-bold mb-2 ${isDark ? 'text-slate-400' : 'text-gray-600'}`;
   const errorClass = 'text-xs text-red-400 mt-1';
 
@@ -196,7 +197,7 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label className={labelClass}>Phone Number *</label>
-                  <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 XXXXX XXXXX" className={inputClass} type="tel" />
+                  <input value={form.phone} onChange={e => { const val = e.target.value.replace(/\D/g, ''); setForm({ ...form, phone: val }); }} placeholder="10-digit mobile number" className={inputClass} type="tel" maxLength={10} />
                   {errors.phone && <p className={errorClass}>{errors.phone}</p>}
                 </div>
                 <div>
@@ -211,7 +212,7 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label className={labelClass}>Gender *</label>
-                  <select value={form.gender} onChange={e => setForm({ ...form, gender: e.target.value })} className={inputClass}>
+                  <select value={form.gender} onChange={e => setForm({ ...form, gender: e.target.value })} className={selectClass}>
                     <option value="">Select Gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
