@@ -106,9 +106,8 @@ export function Card({ children, className = '', hover = false, glow = 'none' }:
 
   return (
     <div
-      className={`rounded-2xl border ${isDark ? 'glass border-white/8' : 'bg-white border-gray-200 shadow-sm'} ${
-        hover ? `hover:-translate-y-1 transition-all duration-300 cursor-pointer ${isDark ? `hover:bg-white/8 ${glowMap[glow]}` : 'hover:shadow-lg hover:border-blue-300'}` : ''
-      } ${className}`}
+      className={`rounded-2xl border ${isDark ? 'glass border-white/8' : 'bg-white border-gray-200 shadow-sm'} ${hover ? `hover:-translate-y-1 transition-all duration-300 cursor-pointer ${isDark ? `hover:bg-white/8 ${glowMap[glow]}` : 'hover:shadow-lg hover:border-blue-300'}` : ''
+        } ${className}`}
     >
       {children}
     </div>
@@ -144,9 +143,8 @@ export function SearchBar({
   };
 
   return (
-    <div className={`flex flex-col sm:flex-row gap-3 p-1 rounded-2xl border ring-2 ring-transparent transition-all focus-within:ring-2 ${
-      isDark ? `glass border-white/10 ${accentMap[accent]?.split(' ').slice(2).join(' ') || 'focus-within:ring-blue-500/30'}` : `bg-white border-gray-300 shadow-sm focus-within:ring-blue-500/30 focus-within:border-blue-400`
-    }`}>
+    <div className={`flex flex-col sm:flex-row gap-3 p-1 rounded-2xl border ring-2 ring-transparent transition-all focus-within:ring-2 ${isDark ? `glass border-white/10 ${accentMap[accent]?.split(' ').slice(2).join(' ') || 'focus-within:ring-blue-500/30'}` : `bg-white border-gray-300 shadow-sm focus-within:ring-blue-500/30 focus-within:border-blue-400`
+      }`}>
       <input
         type="text"
         value={value}
@@ -210,7 +208,7 @@ export function ChatUI() {
   // Function to send message to n8n AI
   const sendMessageToAI = async (userMessage: string): Promise<string> => {
     try {
-      const response = await fetch("https://harshg789.app.n8n.cloud/webhook/d6404487-3e08-4921-b58e-aa4cac78df21/chat", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -222,9 +220,14 @@ export function ChatUI() {
         }),
       });
 
+      if (!response.ok) {
+        console.error("MedAI response error:", response.status);
+        return "Sorry, the AI service is temporarily unavailable. Please try again later.";
+      }
+
       const data = await response.json();
       console.log("AI Doctor's Reply:", data.output);
-      return data.output;
+      return data.output || "I received your query but couldn't generate a response. Please try again.";
 
     } catch (error) {
       console.error("Error connecting to MedAI:", error);

@@ -17,4 +17,13 @@ export default defineConfig({
   css: {
     postcss: './postcss.config.js',
   },
+  server: {
+    proxy: {
+      '/api/chat': {
+        target: 'https://harshg789.app.n8n.cloud',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/chat/, '/webhook/d6404487-3e08-4921-b58e-aa4cac78df21/chat'),
+      },
+    },
+  },
 });
