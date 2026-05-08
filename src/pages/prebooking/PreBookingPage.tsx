@@ -89,18 +89,17 @@ const sendEmails = async () => {
 
     await emailjs.send(
     "service_w4thywk",
-    "template_q1zcqaq",
+    "template_2o8a48h",
     templateParams,
-    "-xTNLGloxlRg2ibDS"
-    );
+   "7Hsq9g2XmK95QTmwu"
+   );
 
-    await emailjs.send(
-    "service_w4thywk",
-    "template_9h1ixfv",
-    templateParams,
-    "-xTNLGloxlRg2ibDS"
-  );
-
+   await emailjs.send(
+   "service_w4thywk",
+   "template_autp1ps",
+   templateParams,
+  "7Hsq9g2XmK95QTmwu"
+);
     console.log("Emails sent successfully");
   } catch (error) {
     console.error("Email error:", error);
