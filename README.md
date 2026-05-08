@@ -1,6 +1,6 @@
 <div style="font-family: Arial, sans-serif; line-height:1.6; max-width:900px; margin:auto;">
 
-<h1>💊 NearMyMed</h1>
+<h1>💊 NearMyMed </h1>
 <p><strong>AI-Powered Medicine & Healthcare Platform</strong></p>
 
 <p>
