@@ -3,6 +3,7 @@ import { useTheme } from '../context/ThemeContext';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+
 interface PageLayoutProps {
   icon: React.ReactNode;
   title: string;
@@ -270,35 +271,70 @@ export function ChatUI() {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const { isDark } = useTheme();
 
-  // Function to send message to n8n AI
-  const sendMessageToAI = async (userMessage: string): Promise<string> => {
-    try {
-      const response = await fetch("/api/chat", {
+  // Function to send message to OpenRouter AI
+
+const sendMessageToAI = async (
+  userMessage: string
+): Promise<string> => {
+  try {
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
         method: "POST",
+
         headers: {
+          "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
+          "HTTP-Referer": "http://localhost:5173",
+          "X-Title": "NearMyMed",
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
-          action: "sendMessage",
-          sessionId: "user-12345",
-          chatInput: userMessage,
+          model: "openai/gpt-3.5-turbo",
+
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a helpful AI medical assistant. Give safe, concise, and accurate medical guidance.",
+            },
+
+            {
+              role: "user",
+              content: userMessage,
+            },
+          ],
         }),
-      });
-
-      if (!response.ok) {
-        console.error("MedAI response error:", response.status);
-        return "Sorry, the AI service is temporarily unavailable. Please try again later.";
       }
+    );
 
-      const data = await response.json();
-      console.log("AI Doctor's Reply:", data.output);
-      return data.output || "I received your query but couldn't generate a response. Please try again.";
+    // Handle API errors
+    if (!response.ok) {
+      console.error(
+        "OpenRouter API Error:",
+        response.status,
+        response.statusText
+      );
 
-    } catch (error) {
-      console.error("Error connecting to MedAI:", error);
-      return "Sorry, server se connection toot gaya. Thodi der baad try karein.";
+      return "Sorry, AI service is temporarily unavailable.";
     }
-  };
+
+    const data = await response.json();
+
+    console.log("OpenRouter Response:", data);
+
+    return (
+      data?.choices?.[0]?.message?.content ||
+      "Sorry, I could not generate a response."
+    );
+
+  } catch (error) {
+    console.error("OpenRouter Connection Error:", error);
+
+    return "Server connection error. Please try again later.";
+  }
+};
+
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
