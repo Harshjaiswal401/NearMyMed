@@ -88,18 +88,18 @@ const sendEmails = async () => {
     };
 
     await emailjs.send(
-      "service_yb3clca",
-      "template_q1zcqaq",
-      templateParams,
-      "-xTNLGloxlRg2ibDS"
+    "service_w4thywk",
+    "template_q1zcqaq",
+    templateParams,
+    "-xTNLGloxlRg2ibDS"
     );
 
     await emailjs.send(
-      "service_yb3clca",
-      "template_9h1ixfv",
-      templateParams,
-      "-xTNLGloxlRg2ibDS"
-    );
+    "service_w4thywk",
+    "template_9h1ixfv",
+    templateParams,
+    "-xTNLGloxlRg2ibDS"
+  );
 
     console.log("Emails sent successfully");
   } catch (error) {
