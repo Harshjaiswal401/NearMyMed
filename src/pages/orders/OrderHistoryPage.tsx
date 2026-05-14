@@ -41,7 +41,17 @@ function getRelativeTime(iso: string) {
 export default function OrderHistoryPage() {
   const { isDark } = useTheme();
   const navigate = useNavigate();
-  const { orders, cancelOrder, clearHistory } = useOrderHistory();
+  const {
+    orders,
+    cancelOrder,
+    clearHistory,
+    searchOrders
+  } = useOrderHistory();
+  const [phone, setPhone] =
+  useState("");
+
+  const [email, setEmail] =
+  useState("");
   const [filter, setFilter] = useState<string>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -57,23 +67,7 @@ export default function OrderHistoryPage() {
   const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
 
   // Empty State
-  if (orders.length === 0) {
-    return (
-      <div className={`min-h-screen ${isDark ? 'bg-[#080c14]' : 'bg-gray-50'} flex items-center justify-center`}>
-        <div className="text-center animate-fade-in-up max-w-md mx-auto px-4">
-          <div className={`w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6 ${isDark ? 'bg-violet-500/10 border border-violet-500/20' : 'bg-violet-50 border border-violet-200'}`}>
-            <Package size={40} className={isDark ? 'text-violet-400' : 'text-violet-500'} />
-          </div>
-          <h2 className={`text-2xl font-black mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>No Orders Yet</h2>
-          <p className={`text-sm mb-8 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Your order history will appear here once you place an order</p>
-          <button onClick={() => navigate('/search/name')}
-            className="bg-blue-600 text-white font-bold px-8 py-4 rounded-2xl hover:bg-blue-500 transition shadow-lg neon-blue text-sm">
-            Start Shopping
-          </button>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-[#080c14] bg-dark-grid' : 'bg-gray-50'}`}>
@@ -104,6 +98,110 @@ export default function OrderHistoryPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* SEARCH ORDERS */}
+        <div
+          className={`rounded-2xl border p-5 mb-8 ${
+            isDark
+              ? 'glass border-white/8'
+              : 'bg-white border-gray-200 shadow-sm'
+          }`}
+        >
+
+          <h2
+            className={`text-lg font-bold mb-4 ${
+              isDark
+                ? 'text-white'
+                : 'text-gray-900'
+            }`}
+          >
+            Find Orders
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            {/* PHONE SEARCH */}
+
+            <div>
+
+              <label
+                className={`block text-xs font-bold mb-2 ${
+                  isDark
+                    ? 'text-slate-400'
+                    : 'text-gray-600'
+                }`}
+              >
+                Phone Number
+              </label>
+
+              <input
+                type="text"
+                placeholder="Enter phone number"
+                value={phone}
+                onChange={(e) =>
+                  setPhone(e.target.value)
+                }
+                className={`w-full px-4 py-3 rounded-xl border text-sm ${
+                  isDark
+                    ? 'bg-white/5 border-white/10 text-white placeholder-slate-500'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                }`}
+              />
+
+              <button
+                onClick={() =>
+                  searchOrders(phone)
+                }
+                className="w-full mt-3 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-500 transition"
+              >
+                Search By Phone
+              </button>
+
+            </div>
+
+            {/* EMAIL SEARCH */}
+
+            <div>
+
+              <label
+                className={`block text-xs font-bold mb-2 ${
+                  isDark
+                    ? 'text-slate-400'
+                    : 'text-gray-600'
+                }`}
+              >
+                Email Address
+              </label>
+
+              <input
+                type="email"
+                placeholder="Enter email"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+                className={`w-full px-4 py-3 rounded-xl border text-sm ${
+                  isDark
+                    ? 'bg-white/5 border-white/10 text-white placeholder-slate-500'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                }`}
+              />
+
+              <button
+                onClick={() =>
+                  searchOrders(
+                    undefined,
+                    email
+                  )
+                }
+                className="w-full mt-3 bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-500 transition"
+              >
+                Search By Email
+              </button>
+
+            </div>
+
+          </div>
+        </div>
         {/* Filters */}
         <div className="flex items-center gap-2 mb-8 overflow-x-auto scrollbar-hide pb-2">
           <Filter size={14} className={isDark ? 'text-slate-500' : 'text-gray-400'} />
@@ -119,9 +217,9 @@ export default function OrderHistoryPage() {
         </div>
 
         {/* Orders */}
-        {filtered.length === 0 ? (
+        {orders.length === 0 ? (
           <div className="text-center py-16">
-            <p className={`text-sm ${isDark ? 'text-slate-500' : 'text-gray-500'}`}>No orders found for this filter</p>
+            <p className={`text-sm ${isDark ? 'text-slate-500' : 'text-gray-500'}`}>No orders found </p>
           </div>
         ) : (
           <div className="space-y-4">

@@ -1,57 +1,348 @@
-import { MapPin, Navigation } from 'lucide-react';
-import { PageLayout, MapPlaceholder } from '../../components/Layout';
+import { useEffect, useState } from 'react';
 
-const pharmacies = [
-  { name: 'Apollo Pharmacy', distance: '0.3 km', address: '12 MG Road, Near Metro Station', open: true, hours: '24/7', phone: '+91 98765 43210', rating: 4.8 },
-  { name: 'MedPlus Health', distance: '0.7 km', address: '45 Brigade Road, Ground Floor', open: true, hours: '8 AM – 10 PM', phone: '+91 98765 43211', rating: 4.5 },
-  { name: 'Wellness Forever', distance: '1.2 km', address: '78 Church Street, Opp. City Bank', open: false, hours: '9 AM – 9 PM', phone: '+91 98765 43212', rating: 4.3 },
-  { name: 'Netmeds Point', distance: '1.8 km', address: '23 Commercial Street', open: true, hours: '8 AM – 11 PM', phone: '+91 98765 43213', rating: 4.6 },
-];
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+} from 'react-leaflet';
+
+import L from 'leaflet';
+
+import { Navigation } from 'lucide-react';
+
+import 'leaflet/dist/leaflet.css';
+
+// FIX LEAFLET DEFAULT ICONS
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+
+  iconUrl:
+    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+
+  shadowUrl:
+    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+// PHARMACY ICON
+const pharmacyIcon = new L.Icon({
+  iconUrl:
+    'https://cdn-icons-png.flaticon.com/512/4320/4320337.png',
+
+  iconSize: [32, 32],
+});
+
+type Pharmacy = {
+  place_id: string;
+  name: string;
+  lat: string;
+  lon: string;
+  display_name: string;
+  distance?: string;
+  duration?: string;
+};
 
 export default function PharmacyDirections() {
+  const [userLocation, setUserLocation] = useState<
+    [number, number] | null
+  >(null);
+
+  const [pharmacies, setPharmacies] = useState<
+    Pharmacy[]
+  >([]);
+
+  const [loading, setLoading] = useState(true);
+
+  // GET CURRENT LOCATION
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation([
+          position.coords.latitude,
+          position.coords.longitude,
+        ]);
+      },
+
+      (error) => {
+        console.error(
+          'Location Error:',
+          error
+        );
+
+        alert(
+          'Please allow location access'
+        );
+      },
+
+      {
+        enableHighAccuracy: true,
+      }
+    );
+  }, []);
+
+  // FETCH PHARMACIES
+  useEffect(() => {
+    if (!userLocation) return;
+
+    const [lat, lon] = userLocation;
+
+    async function fetchPharmacies() {
+      try {
+        const overpassQuery = `
+[out:json];
+
+(
+  node["amenity"="pharmacy"](around:3000,${lat},${lon});
+  way["amenity"="pharmacy"](around:3000,${lat},${lon});
+  relation["amenity"="pharmacy"](around:3000,${lat},${lon});
+
+  node["shop"="chemist"](around:3000,${lat},${lon});
+  way["shop"="chemist"](around:3000,${lat},${lon});
+  relation["shop"="chemist"](around:3000,${lat},${lon});
+);
+
+out center tags;
+`;
+
+        const response = await fetch(
+          'https://overpass-api.de/api/interpreter',
+          {
+            method: 'POST',
+            body: overpassQuery,
+          }
+        );
+
+        const data = await response.json();
+
+        console.log(
+          'OVERPASS DATA:',
+          data
+        );
+
+        if (
+          !data.elements ||
+          data.elements.length === 0
+        ) {
+          setPharmacies([]);
+          return;
+        }
+
+        const enriched: Pharmacy[] =
+          data.elements.map(
+            (
+              p: any,
+              index: number
+            ) => {
+              const pharmacyLat =
+                p.lat ||
+                p.center?.lat;
+
+              const pharmacyLon =
+                p.lon ||
+                p.center?.lon;
+
+              // SIMPLE DISTANCE
+              const distance =
+                Math.sqrt(
+                  Math.pow(
+                    pharmacyLat - lat,
+                    2
+                  ) +
+                      Math.pow(
+                        pharmacyLon - lon,
+                        2
+                      )
+                );
+
+              return {
+                place_id:
+                  p.id?.toString() ||
+                  index.toString(),
+
+                name:
+                  p.tags?.name ||
+                  'Medical Store',
+
+                lat: pharmacyLat.toString(),
+
+                lon: pharmacyLon.toString(),
+
+                display_name:
+                  p.tags?.[
+                    'addr:full'
+                  ] ||
+                  p.tags?.name ||
+                  'Nearby Pharmacy',
+
+                distance: `${(
+                  distance * 111
+                ).toFixed(1)} km`,
+
+                duration: `${Math.max(
+                  2,
+                  Math.round(
+                    distance *
+                      111 *
+                      3
+                  )
+                )} mins`,
+              };
+            }
+          );
+
+        // SORT NEAREST FIRST
+        enriched.sort(
+          (
+            a: Pharmacy,
+            b: Pharmacy
+          ) =>
+            parseFloat(
+              a.distance || '999'
+            ) -
+            parseFloat(
+              b.distance || '999'
+            )
+        );
+
+        setPharmacies(enriched);
+      } catch (err) {
+        console.error(
+          'Overpass Error:',
+          err
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPharmacies();
+  }, [userLocation]);
+
+  // LOADING
+  if (!userLocation || loading) {
+    return (
+      <div className="text-white p-6">
+        Loading nearby pharmacies...
+      </div>
+    );
+  }
+
   return (
-    <PageLayout
-      icon={<MapPin size={26} className="text-blue-400" />}
-      title="Nearby Pharmacies"
-      subtitle="Find pharmacies near you with directions and real-time availability."
-      badge="Location Services"
-      badgeColor="blue"
-    >
-      <div className="mb-8">
-        <MapPlaceholder label="Pharmacy Map" />
+    <div className="p-6 text-white">
+      {/* MAP */}
+      <div className="rounded-2xl overflow-hidden mb-6 border border-white/10">
+        <MapContainer
+          center={userLocation}
+          zoom={14}
+          style={{
+            height: '350px',
+            width: '100%',
+          }}
+        >
+          <TileLayer
+            attribution="&copy; OpenStreetMap contributors"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+
+          {/* USER LOCATION */}
+          <Marker position={userLocation}>
+            <Popup>
+              Your Current Location
+            </Popup>
+          </Marker>
+
+          {/* PHARMACIES */}
+          {pharmacies.map((p) => (
+            <Marker
+              key={p.place_id}
+              icon={pharmacyIcon}
+              position={[
+                Number(p.lat),
+                Number(p.lon),
+              ]}
+            >
+              <Popup>
+                {p.name}
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
       </div>
 
-      <div>
-        <h2 className="text-lg font-bold text-white mb-4">Pharmacies Near You</h2>
-        <div className="space-y-3">
-          {pharmacies.map((p) => (
-            <div key={p.name} className="glass rounded-2xl border border-white/8 p-5 hover:bg-white/5 hover:border-blue-500/25 transition-all group cursor-pointer">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-4 flex-1">
-                  <div className="w-11 h-11 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center justify-center text-xl flex-shrink-0">🏥</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h3 className="font-bold text-white group-hover:text-blue-300 transition">{p.name}</h3>
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${p.open ? 'text-green-400 bg-green-500/10 border border-green-500/20' : 'text-red-400 bg-red-500/10 border border-red-500/20'}`}>
-                        {p.open ? '● Open' : '○ Closed'}
+      {/* EMPTY */}
+      {pharmacies.length === 0 && (
+        <div className="text-center text-slate-400 mt-6">
+          No nearby pharmacies found.
+        </div>
+      )}
+
+      {/* LIST */}
+      <div className="space-y-4">
+        {pharmacies.map(
+          (p, index) => (
+            <div
+              key={p.place_id}
+              className="border border-white/10 rounded-2xl p-5 bg-black/20 backdrop-blur"
+            >
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <h3 className="font-bold text-lg">
+                      {p.name}
+                    </h3>
+
+                    {index ===
+                      0 && (
+                      <span className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full">
+                        Nearest
                       </span>
-                    </div>
-                    <p className="text-xs text-slate-500 mb-2">{p.address}</p>
-                    <div className="flex items-center gap-4 text-xs text-slate-500">
-                      <span className="flex items-center gap-1"><MapPin size={11} className="text-blue-400" /> {p.distance}</span>
-                      <span>🕐 {p.hours}</span>
-                      <span>⭐ {p.rating}</span>
-                    </div>
+                    )}
+                  </div>
+
+                  <p className="text-slate-400 text-sm mt-1">
+                    {
+                      p.display_name
+                    }
+                  </p>
+
+                  <div className="flex gap-4 mt-3 text-sm flex-wrap">
+                    <span>
+                      📍{' '}
+                      {
+                        p.distance
+                      }
+                    </span>
+
+                    <span>
+                      🚗{' '}
+                      {
+                        p.duration
+                      }
+                    </span>
                   </div>
                 </div>
-                <button className="flex items-center gap-2 bg-blue-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-blue-500 transition shadow-lg ml-4 flex-shrink-0">
-                  <Navigation size={13} /> Directions
+
+                {/* BUTTON */}
+                <button
+                  onClick={() => {
+                    window.open(
+                      `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}`,
+                      '_blank'
+                    );
+                  }}
+                  className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl flex items-center gap-2 transition"
+                >
+                  <Navigation size={16} />
+                  Directions
                 </button>
               </div>
             </div>
-          ))}
-        </div>
+          )
+        )}
       </div>
-    </PageLayout>
+    </div>
   );
 }

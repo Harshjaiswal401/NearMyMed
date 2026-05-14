@@ -1,39 +1,42 @@
-// import { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { Clock, AlertTriangle, CheckCircle, MapPin, User, Phone, FileText, Zap, Package, ArrowLeft, ChevronRight } from 'lucide-react';
-// import { useTheme } from '../../context/ThemeContext';
-// import { useCart } from '../../context/CartContext';
-// import emailjs from "@emailjs/browser";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Clock, AlertTriangle, CheckCircle, MapPin, User, Phone, FileText, Zap, Package, ArrowLeft, ChevronRight } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
+import { useCart } from '../../context/CartContext';
+import emailjs from "@emailjs/browser";
+import {
+  useOrderHistory
+} from "../../context/OrderHistoryContext";
 
-// const emergencyMedicines = [
-//   { id: 'paracetamol-500', name: 'Paracetamol 500mg', brand: 'Calpol', price: 12, priceDisplay: '₹12', type: 'Tablet', purpose: 'Fever & Pain Relief' },
-//   { id: 'salbutamol-inhaler', name: 'Salbutamol Inhaler', brand: 'Asthalin', price: 135, priceDisplay: '₹135', type: 'Inhaler', purpose: 'Asthma Emergency' },
-//   { id: 'ondansetron-4', name: 'Ondansetron 4mg', brand: 'Emeset', price: 25, priceDisplay: '₹25', type: 'Tablet', purpose: 'Severe Nausea/Vomiting' },
-//   { id: 'cetirizine-10', name: 'Cetirizine 10mg', brand: 'Cetzine', price: 10, priceDisplay: '₹10', type: 'Tablet', purpose: 'Allergic Reaction' },
-//   { id: 'omeprazole-20', name: 'Omeprazole 20mg', brand: 'Prilosec', price: 32, priceDisplay: '₹32', type: 'Capsule', purpose: 'Severe Acidity' },
-//   { id: 'diclofenac-50', name: 'Diclofenac 50mg', brand: 'Voveran', price: 22, priceDisplay: '₹22', type: 'Tablet', purpose: 'Acute Pain/Inflammation' },
-//   { id: 'levocetirizine-5', name: 'Levocetirizine 5mg', brand: 'Xyzal', price: 15, priceDisplay: '₹15', type: 'Tablet', purpose: 'Severe Allergy' },
-//   { id: 'domperidone-10', name: 'Domperidone 10mg', brand: 'Domstal', price: 14, priceDisplay: '₹14', type: 'Tablet', purpose: 'Nausea Emergency' },
-// ];
+const emergencyMedicines = [
+  { id: 'paracetamol-500', name: 'Paracetamol 500mg', brand: 'Calpol', price: 12, priceDisplay: '₹12', type: 'Tablet', purpose: 'Fever & Pain Relief' },
+  { id: 'salbutamol-inhaler', name: 'Salbutamol Inhaler', brand: 'Asthalin', price: 135, priceDisplay: '₹135', type: 'Inhaler', purpose: 'Asthma Emergency' },
+  { id: 'ondansetron-4', name: 'Ondansetron 4mg', brand: 'Emeset', price: 25, priceDisplay: '₹25', type: 'Tablet', purpose: 'Severe Nausea/Vomiting' },
+  { id: 'cetirizine-10', name: 'Cetirizine 10mg', brand: 'Cetzine', price: 10, priceDisplay: '₹10', type: 'Tablet', purpose: 'Allergic Reaction' },
+  { id: 'omeprazole-20', name: 'Omeprazole 20mg', brand: 'Prilosec', price: 32, priceDisplay: '₹32', type: 'Capsule', purpose: 'Severe Acidity' },
+  { id: 'diclofenac-50', name: 'Diclofenac 50mg', brand: 'Voveran', price: 22, priceDisplay: '₹22', type: 'Tablet', purpose: 'Acute Pain/Inflammation' },
+  { id: 'levocetirizine-5', name: 'Levocetirizine 5mg', brand: 'Xyzal', price: 15, priceDisplay: '₹15', type: 'Tablet', purpose: 'Severe Allergy' },
+  { id: 'domperidone-10', name: 'Domperidone 10mg', brand: 'Domstal', price: 14, priceDisplay: '₹14', type: 'Tablet', purpose: 'Nausea Emergency' },
+];
 
-// const emergencyReasons = [
-//   'Severe allergic reaction (anaphylaxis)',
-//   'Diabetic emergency (hypo/hyperglycemia)',
-//   'Heart condition / Chest pain',
-//   'High fever in child (>103°F)',
-//   'Asthma / Breathing difficulty',
-//   'Severe pain (injury/accident)',
-//   'Post-surgical medicine urgency',
-//   'Severe vomiting / dehydration',
-//   'Seizure / Epilepsy episode',
-//   'Other emergency reason',
-// ];
+const emergencyReasons = [
+  'Severe allergic reaction (anaphylaxis)',
+  'Diabetic emergency (hypo/hyperglycemia)',
+  'Heart condition / Chest pain',
+  'High fever in child (>103°F)',
+  'Asthma / Breathing difficulty',
+  'Severe pain (injury/accident)',
+  'Post-surgical medicine urgency',
+  'Severe vomiting / dehydration',
+  'Seizure / Epilepsy episode',
+  'Other emergency reason',
+];
 
-// const urgencyLevels = [
-//   { value: 'critical', label: '🔴 Critical', desc: 'Need within 30 minutes', time: '< 30 min', color: 'red' },
-//   { value: 'high', label: '🟠 High', desc: 'Need within 1 hour', time: '< 1 hour', color: 'orange' },
-//   { value: 'standard', label: '🟡 Standard', desc: 'Need within 3 hours', time: '< 3 hours', color: 'yellow' },
-// ];
+const urgencyLevels = [
+  { value: 'critical', label: '🔴 Critical', desc: 'Need within 30 minutes', time: '< 30 min', color: 'red' },
+  { value: 'high', label: '🟠 High', desc: 'Need within 1 hour', time: '< 1 hour', color: 'orange' },
+  { value: 'standard', label: '🟡 Standard', desc: 'Need within 3 hours', time: '< 3 hours', color: 'yellow' },
+];
 
 export default function PreBookingPage() {
   const { isDark } = useTheme();
@@ -43,22 +46,125 @@ export default function PreBookingPage() {
   const [selectedMeds, setSelectedMeds] = useState<string[]>([]);
   const [form, setForm] = useState({
     reason: '', customReason: '', urgency: 'high',
-    patientName: '', patientAge: '', patientPhone: '', patientAddress: '',
+    patientName: '', patientAge: '', patientPhone: '', patientAddress: '', patientEmail: '',
   });
+  const { addOrder } = useOrderHistory();
 
   const toggleMed = (id: string) => {
     setSelectedMeds(prev => prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]);
   };
 
   const handleConfirm = async () => {
-    // Add selected meds to cart
+
+  try {
+
+    // Add medicines to cart
     selectedMeds.forEach(id => {
-      const med = emergencyMedicines.find(m => m.id === id);
-      if (med) addToCart({ id: med.id, name: med.name, brand: med.brand, price: med.price, priceDisplay: med.priceDisplay, type: med.type });
+
+      const med =
+        emergencyMedicines.find(
+          m => m.id === id
+        );
+
+      if (med) {
+
+        addToCart({
+          id: med.id,
+          name: med.name,
+          brand: med.brand,
+          price: med.price,
+          priceDisplay: med.priceDisplay,
+          type: med.type,
+        });
+      }
     });
+
+    // Full medicine data
+    const orderedMedicines =
+      selectedMeds.map(id =>
+        emergencyMedicines.find(
+          med => med.id === id
+        )
+      );
+
+    // Total price
+    const totalPrice =
+      orderedMedicines.reduce(
+        (acc, med) =>
+          acc + (med?.price || 0),
+        0
+      );
+
+    await addOrder({
+      items:
+        orderedMedicines.map(
+          med => ({
+            id: med?.id || "",
+            name: med?.name || "",
+            brand: med?.brand || "",
+            price: med?.price || 0,
+            priceDisplay:
+              med?.priceDisplay || "",
+            quantity: 1,
+            type: med?.type || "",
+          })
+        ),
+
+      subtotal:
+        totalPrice,
+
+      deliveryFee:
+        0,
+
+      total:
+        totalPrice,
+
+      paymentMethod:
+        "Emergency Booking",
+
+      deliveryAddress: {
+
+        fullName:
+          form.patientName,
+
+        phone:
+          form.patientPhone,
+
+        email:
+          form.patientEmail,
+
+        address1:
+          form.patientAddress,
+
+        address2:
+          "",
+
+        city:
+          "",
+
+        state:
+          "",
+
+        pinCode:
+          "",
+      },
+    });
+
+    // SEND EMAILS
     await sendEmails();
+
+    // SUCCESS PAGE
     setStep(3);
-  };
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert(
+      "Failed to place order"
+    );
+  }
+};
 
 
 
@@ -149,7 +255,7 @@ const sendEmails = async () => {
             <button onClick={() => navigate('/cart')} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-500 transition text-sm">View Cart</button>
             <button onClick={() => navigate('/')} className={`px-6 py-3 rounded-xl font-bold text-sm transition border ${isDark ? 'glass border-white/10 text-slate-300' : 'bg-gray-100 border-gray-200 text-gray-700'}`}>Back to Home</button>
           </div>
-        </div>
+        </div>0
       </div>
     );
   }
