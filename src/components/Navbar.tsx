@@ -38,16 +38,6 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    id: 'alternatives',
-    label: 'Alternatives',
-    icon: <ArrowLeftRight size={15} />,
-    items: [
-      { label: 'Cheapest Option', route: '/alternatives/cheap', icon: <Tag size={14} />, description: 'Same drug, lower cost' },
-      { label: 'Same Brand', route: '/alternatives/brand', icon: <Bookmark size={14} />, description: 'Trusted brand variants' },
-      { label: 'Less Side Effects', route: '/alternatives/safe', icon: <ShieldCheck size={14} />, description: 'Safer formulations' },
-    ],
-  },
-  {
     id: 'pharmacy',
     label: 'Pharmacy',
     icon: <Building2 size={15} />,

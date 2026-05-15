@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import {
-  Search, ArrowLeftRight, Building2, Bot, ScanLine,
+  Search, Building2, Bot, ScanLine,
   Upload, Shield, Zap, MapPin, Activity, Pill, Heart, Clock, Users,
   TrendingUp, ChevronRight, Star, Microscope, Brain, Stethoscope, ShoppingCart, CheckCircle,
 } from 'lucide-react';
@@ -8,10 +8,8 @@ import { useTheme } from '../context/ThemeContext';
 import { useCart } from '../context/CartContext';
 import { medicineDatabase } from '../data/medicineData';
 import { useState } from 'react';
-
 const quickActions = [
   { label: 'Search by Name', route: '/search/name', icon: <Search size={20} />, color: 'from-blue-500 to-blue-600', glow: 'neon-blue', text: 'text-blue-400' },
-  { label: 'Find Alternatives', route: '/alternatives/cheap', icon: <ArrowLeftRight size={20} />, color: 'from-indigo-500 to-indigo-600', glow: 'neon-violet', text: 'text-indigo-400' },
   { label: 'Nearby Pharmacy', route: '/pharmacy/directions', icon: <Building2 size={20} />, color: 'from-teal-500 to-teal-600', glow: 'neon-cyan', text: 'text-teal-400' },
   { label: 'Pre-Book', route: '/prebooking', icon: <Clock size={20} />, color: 'from-orange-500 to-orange-600', text: 'text-orange-400', isEmergency: true },
   { label: 'AI Assistant', route: '/ai/medicine', icon: <Bot size={20} />, color: 'from-violet-500 to-violet-600', glow: 'neon-violet', text: 'text-violet-400' },

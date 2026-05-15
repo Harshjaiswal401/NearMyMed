@@ -95,7 +95,7 @@ export default function PreBookingPage() {
         0
       );
 
-    await addOrder({
+    addOrder({
       items:
         orderedMedicines.map(
           med => ({
@@ -255,7 +255,7 @@ const sendEmails = async () => {
             <button onClick={() => navigate('/cart')} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-500 transition text-sm">View Cart</button>
             <button onClick={() => navigate('/')} className={`px-6 py-3 rounded-xl font-bold text-sm transition border ${isDark ? 'glass border-white/10 text-slate-300' : 'bg-gray-100 border-gray-200 text-gray-700'}`}>Back to Home</button>
           </div>
-        </div>0
+        </div>
       </div>
     );
   }
@@ -357,10 +357,23 @@ const sendEmails = async () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {urgencyLevels.map(u => (
                   <button key={u.value} onClick={() => setForm({ ...form, urgency: u.value })}
-                    className={`p-4 rounded-xl border text-left transition ${form.urgency === u.value
-                      ? (isDark ? `border-${u.color}-500/40 bg-${u.color}-500/10` : `border-${u.color}-400 bg-${u.color}-50`)
-                      : (isDark ? 'border-white/8 hover:border-white/20' : 'border-gray-200 hover:border-gray-300')
-                    }`}>
+                    className={`p-4 rounded-xl border text-left transition ${
+                    form.urgency === u.value
+                      ? isDark
+                        ? u.color === 'red'
+                          ? 'border-red-500/40 bg-red-500/10'
+                          : u.color === 'orange'
+                          ? 'border-orange-500/40 bg-orange-500/10'
+                          : 'border-yellow-500/40 bg-yellow-500/10'
+                        : u.color === 'red'
+                        ? 'border-red-400 bg-red-50'
+                        : u.color === 'orange'
+                        ? 'border-orange-400 bg-orange-50'
+                        : 'border-yellow-400 bg-yellow-50'
+                      : isDark
+                      ? 'border-white/8 hover:border-white/20'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}>
                     <p className="font-bold text-sm">{u.label}</p>
                     <p className={`text-xs mt-1 ${isDark ? 'text-slate-500' : 'text-gray-500'}`}>{u.desc}</p>
                   </button>

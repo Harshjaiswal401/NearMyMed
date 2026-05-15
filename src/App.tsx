@@ -7,9 +7,6 @@ import Home from './pages/Home';
 import SearchByName from './pages/search/SearchByName';
 import SearchBySalt from './pages/search/SearchBySalt';
 import SearchByDisease from './pages/search/SearchByDisease';
-import CheapAlternatives from './pages/alternatives/CheapAlternatives';
-import BrandAlternatives from './pages/alternatives/BrandAlternatives';
-import SafeAlternatives from './pages/alternatives/SafeAlternatives';
 import PharmacyDirections from './pages/pharmacy/PharmacyDirections';
 import PharmacyCall from './pages/pharmacy/PharmacyCall';
 import PharmacyAvailability from './pages/pharmacy/PharmacyAvailability';
@@ -44,9 +41,6 @@ function AppContent() {
         <Route path="/search/name" element={<SearchByName />} />
         <Route path="/search/salt" element={<SearchBySalt />} />
         <Route path="/search/disease" element={<SearchByDisease />} />
-        <Route path="/alternatives/cheap" element={<CheapAlternatives />} />
-        <Route path="/alternatives/brand" element={<BrandAlternatives />} />
-        <Route path="/alternatives/safe" element={<SafeAlternatives />} />
         <Route path="/pharmacy/directions" element={<PharmacyDirections />} />
         <Route path="/pharmacy/call" element={<PharmacyCall />} />
         <Route path="/pharmacy/availability" element={<PharmacyAvailability />} />
