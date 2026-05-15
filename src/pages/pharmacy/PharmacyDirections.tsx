@@ -14,6 +14,12 @@ import { Navigation } from 'lucide-react';
 
 import 'leaflet/dist/leaflet.css';
 
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
 // ======================================
 // FIX LEAFLET DEFAULT ICONS
 // ======================================
@@ -21,14 +27,11 @@ delete (L.Icon.Default.prototype as any)
   ._getIconUrl;
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconRetinaUrl: markerIcon2x,
 
-  iconUrl:
-    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  iconUrl: markerIcon,
 
-  shadowUrl:
-    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  shadowUrl: markerShadow,
 });
 
 // ======================================
@@ -165,6 +168,16 @@ export default function PharmacyDirections() {
   // GET USER LOCATION
   // ======================================
   useEffect(() => {
+    if (!navigator.geolocation) {
+      setError(
+        'Geolocation is not supported'
+      );
+
+      setLoading(false);
+
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setUserLocation([
@@ -201,10 +214,8 @@ export default function PharmacyDirections() {
       try {
         setLoading(true);
 
-        // 15KM RADIUS
         const radius = 15000;
 
-        // OVERPASS QUERY
         const query = `
 [out:json][timeout:25];
 (
@@ -221,8 +232,11 @@ export default function PharmacyDirections() {
 out center;
 `;
 
+        // ======================================
+        // FETCH FROM VERCEL API
+        // ======================================
         const response = await fetch(
-          'https://overpass-api.de/api/interpreter',
+          '/api/overpass',
           {
             method: 'POST',
 
@@ -234,6 +248,12 @@ out center;
             body: query,
           }
         );
+
+        if (!response.ok) {
+          throw new Error(
+            'Failed API request'
+          );
+        }
 
         const data =
           await response.json();
@@ -404,9 +424,6 @@ out center;
 
   return (
     <div className="p-6 text-white">
-      {/* ====================================== */}
-      {/* MAP */}
-      {/* ====================================== */}
       <div className="rounded-2xl overflow-hidden mb-6 border border-white/10">
         <MapContainer
           center={userLocation}
@@ -421,13 +438,11 @@ out center;
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {/* AUTO FIT */}
           <FitBounds
             pharmacies={pharmacies}
             userLocation={userLocation}
           />
 
-          {/* USER LOCATION */}
           <Marker
             position={userLocation}
             icon={userIcon}
@@ -437,7 +452,6 @@ out center;
             </Popup>
           </Marker>
 
-          {/* PHARMACY MARKERS */}
           {pharmacies.map((p) => (
             <Marker
               key={p.place_id}
@@ -492,94 +506,6 @@ out center;
             </Marker>
           ))}
         </MapContainer>
-      </div>
-
-      {/* ====================================== */}
-      {/* EMPTY STATE */}
-      {/* ====================================== */}
-      {pharmacies.length === 0 && (
-        <div className="text-center text-slate-400 mt-6">
-          <p>
-            No nearby pharmacies
-            found.
-          </p>
-
-          <button
-            onClick={() =>
-              window.location.reload()
-            }
-            className="mt-4 bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl"
-          >
-            Retry
-          </button>
-        </div>
-      )}
-
-      {/* ====================================== */}
-      {/* LIST */}
-      {/* ====================================== */}
-      <div className="space-y-4">
-        {pharmacies.map(
-          (p, index) => (
-            <div
-              key={p.place_id}
-              className="border border-white/10 rounded-2xl p-5 bg-black/20 backdrop-blur"
-            >
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <h3 className="font-bold text-lg">
-                      {p.name}
-                    </h3>
-
-                    {index ===
-                      0 && (
-                      <span className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full">
-                        Nearest
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="text-slate-400 text-sm mt-1">
-                    {
-                      p.display_name
-                    }
-                  </p>
-
-                  <div className="flex gap-4 mt-3 text-sm flex-wrap">
-                    <span>
-                      📍{' '}
-                      {
-                        p.distance
-                      }
-                    </span>
-
-                    <span>
-                      🚗{' '}
-                      {
-                        p.duration
-                      }
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    window.open(
-                      `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}`,
-                      '_blank'
-                    );
-                  }}
-                  className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl flex items-center gap-2 transition"
-                >
-                  <Navigation size={16} />
-
-                  Directions
-                </button>
-              </div>
-            </div>
-          )
-        )}
       </div>
     </div>
   );
