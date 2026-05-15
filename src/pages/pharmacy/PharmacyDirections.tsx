@@ -15,28 +15,26 @@ import { Navigation } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
-
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 // ======================================
 // FIX LEAFLET DEFAULT ICONS
 // ======================================
+
 delete (L.Icon.Default.prototype as any)
   ._getIconUrl;
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
-
   iconUrl: markerIcon,
-
   shadowUrl: markerShadow,
 });
 
 // ======================================
 // USER LOCATION ICON
 // ======================================
+
 const userIcon = new L.Icon({
   iconUrl:
     'https://cdn-icons-png.flaticon.com/512/64/64113.png',
@@ -49,6 +47,7 @@ const userIcon = new L.Icon({
 // ======================================
 // PHARMACY ICON
 // ======================================
+
 const pharmacyIcon = new L.Icon({
   iconUrl:
     'https://cdn-icons-png.flaticon.com/512/2776/2776067.png',
@@ -63,6 +62,7 @@ const pharmacyIcon = new L.Icon({
 // ======================================
 // TYPES
 // ======================================
+
 type Pharmacy = {
   place_id: string;
 
@@ -82,6 +82,7 @@ type Pharmacy = {
 // ======================================
 // DISTANCE CALCULATION
 // ======================================
+
 function calculateDistance(
   lat1: number,
   lon1: number,
@@ -117,6 +118,7 @@ function calculateDistance(
 // ======================================
 // AUTO FIT MAP
 // ======================================
+
 function FitBounds({
   pharmacies,
   userLocation,
@@ -149,6 +151,7 @@ function FitBounds({
 // ======================================
 // MAIN COMPONENT
 // ======================================
+
 export default function PharmacyDirections() {
   const [userLocation, setUserLocation] =
     useState<[number, number] | null>(
@@ -167,6 +170,7 @@ export default function PharmacyDirections() {
   // ======================================
   // GET USER LOCATION
   // ======================================
+
   useEffect(() => {
     if (!navigator.geolocation) {
       setError(
@@ -205,6 +209,7 @@ export default function PharmacyDirections() {
   // ======================================
   // FETCH PHARMACIES
   // ======================================
+
   useEffect(() => {
     if (!userLocation) return;
 
@@ -214,61 +219,59 @@ export default function PharmacyDirections() {
       try {
         setLoading(true);
 
+        setError('');
+
+        // 15 KM
         const radius = 15000;
 
+        // Optimized Query
         const query = `
-[out:json][timeout:25];
+[out:json][timeout:20];
+
 (
   node["amenity"="pharmacy"](around:${radius},${lat},${lon});
   way["amenity"="pharmacy"](around:${radius},${lat},${lon});
-  relation["amenity"="pharmacy"](around:${radius},${lat},${lon});
 
   node["shop"="chemist"](around:${radius},${lat},${lon});
   way["shop"="chemist"](around:${radius},${lat},${lon});
-
-  node["healthcare"="pharmacy"](around:${radius},${lat},${lon});
-  way["healthcare"="pharmacy"](around:${radius},${lat},${lon});
 );
-out center;
+
+out body center;
 `;
 
-        // ======================================
-        // FETCH FROM API
-        // ======================================
+        // LOCALHOST / VERCEL
+        const apiUrl =
+          import.meta.env.DEV
+            ? 'https://overpass-api.de/api/interpreter'
+            : '/api/overpass';
 
-const apiUrl =
-  window.location.hostname ===
-  'localhost'
-    ? 'https://overpass.kumi.systems/api/interpreter'
-    : '/api/overpass';
+        const response = await fetch(
+          apiUrl,
+          {
+            method: 'POST',
 
-    const response = await fetch(
-      apiUrl,
-      {
-        method: 'POST',
+            headers: {
+              'Content-Type':
+                'text/plain',
+            },
 
-        headers: {
-          'Content-Type':
-            'text/plain',
-        },
+            body: query,
+          }
+        );
 
-        body: query,
-      }
-    );
+        if (!response.ok) {
+          throw new Error(
+            `API Error: ${response.status}`
+          );
+        }
 
-    if (!response.ok) {
-      throw new Error(
-        `API Error: ${response.status}`
-      );
-    }
+        const data =
+          await response.json();
 
-    const data =
-      await response.json();
-
-    console.log(
-      'OVERPASS DATA:',
-      data
-    );
+        console.log(
+          'OVERPASS DATA:',
+          data
+        );
 
         if (
           !data.elements ||
@@ -281,6 +284,7 @@ const apiUrl =
         // ======================================
         // REMOVE DUPLICATES
         // ======================================
+
         const uniquePlaces =
           new Map();
 
@@ -294,13 +298,14 @@ const apiUrl =
           if (!latitude || !longitude)
             return;
 
-          const coords =
+          const key =
+            p.tags?.name ||
             `${latitude}-${longitude}`;
 
           if (
-            !uniquePlaces.has(coords)
+            !uniquePlaces.has(key)
           ) {
-            uniquePlaces.set(coords, {
+            uniquePlaces.set(key, {
               ...p,
               latitude,
               longitude,
@@ -311,67 +316,80 @@ const apiUrl =
         // ======================================
         // FORMAT DATA
         // ======================================
-        const enriched = Array.from(
-          uniquePlaces.values()
-        ).map(
-          (
-            p: any,
-            index: number
-          ) => {
-            const pharmacyLat =
-              p.latitude;
 
-            const pharmacyLon =
-              p.longitude;
+        const enriched: Pharmacy[] = Array.from(
+  uniquePlaces.values()
+)
+  .map(
+    (
+      p: any,
+      index: number
+    ): Pharmacy | null => {
 
-            const distance =
-              calculateDistance(
-                lat,
-                lon,
-                pharmacyLat,
-                pharmacyLon
-              );
+      const pharmacyLat =
+        p.latitude;
 
-            return {
-              place_id:
-                p.id?.toString() ||
-                index.toString(),
+      const pharmacyLon =
+        p.longitude;
 
-              name:
-                p.tags?.name ||
-                p.tags?.brand ||
-                'Medical Store',
-
-              lat: pharmacyLat.toString(),
-
-              lon: pharmacyLon.toString(),
-
-              display_name:
-                p.tags?.['addr:street'] ||
-                p.tags?.['addr:full'] ||
-                'Nearby Pharmacy',
-
-              distance: `${distance.toFixed(
-                2
-              )} km`,
-
-              duration: `${Math.max(
-                2,
-                Math.round(
-                  distance * 4
-                )
-              )} mins`,
-            };
-          }
+      const distance =
+        calculateDistance(
+          lat,
+          lon,
+          pharmacyLat,
+          pharmacyLon
         );
 
+      // FILTER > 15 KM
+      if (distance > 15)
+        return null;
+
+      return {
+        place_id:
+          p.id?.toString() ||
+          index.toString(),
+
+        name:
+          p.tags?.name ||
+          p.tags?.brand ||
+          'Medical Store',
+
+        lat: pharmacyLat.toString(),
+
+        lon: pharmacyLon.toString(),
+
+        display_name:
+          p.tags?.['addr:street'] ||
+          p.tags?.['addr:suburb'] ||
+          p.tags?.['addr:full'] ||
+          'Nearby Pharmacy',
+
+        distance: `${distance.toFixed(
+          2
+        )} km`,
+
+        duration: `${Math.max(
+          2,
+          Math.round(distance * 4)
+        )} mins`,
+      };
+    }
+  )
+
+  .filter(
+    (
+      item
+    ): item is Pharmacy => item !== null
+  );
+
         // ======================================
-        // SORT BY NEAREST
+        // SORT BY DISTANCE
         // ======================================
+
         enriched.sort(
           (
-            a: Pharmacy,
-            b: Pharmacy
+            a: any,
+            b: any
           ) =>
             Number(
               a.distance.replace(
@@ -387,7 +405,11 @@ const apiUrl =
             )
         );
 
-        setPharmacies(enriched);
+        // LIMIT RESULTS
+        setPharmacies(
+          enriched.slice(0, 50)
+        );
+
       } catch (err) {
         console.error(err);
 
@@ -400,14 +422,16 @@ const apiUrl =
     }
 
     fetchPharmacies();
+
   }, [userLocation]);
 
   // ======================================
   // ERROR STATE
   // ======================================
+
   if (error) {
     return (
-      <div className="p-6 text-red-400">
+      <div className="p-6 text-red-500">
         {error}
       </div>
     );
@@ -416,10 +440,11 @@ const apiUrl =
   // ======================================
   // LOADING STATE
   // ======================================
+
   if (loading || !userLocation) {
     return (
-      <div className="flex items-center gap-3 p-6 text-white">
-        <div className="animate-spin h-6 w-6 border-2 border-white border-t-transparent rounded-full" />
+      <div className="flex items-center gap-3 p-6 text-black dark:text-white">
+        <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full" />
 
         <span>
           Searching nearby medical
@@ -430,11 +455,17 @@ const apiUrl =
   }
 
   return (
-    <div className="p-6 text-white">
-      <div className="rounded-2xl overflow-hidden mb-6 border border-white/10">
+    <div className="p-6">
+
+      {/* ========================= */}
+      {/* MAP SECTION */}
+      {/* ========================= */}
+
+      <div className="rounded-2xl overflow-hidden mb-6 border border-gray-200">
+
         <MapContainer
           center={userLocation}
-          zoom={14}
+          zoom={13}
           style={{
             height: '600px',
             width: '100%',
@@ -445,11 +476,13 @@ const apiUrl =
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
+          {/* AUTO FIT */}
           <FitBounds
             pharmacies={pharmacies}
             userLocation={userLocation}
           />
 
+          {/* USER LOCATION */}
           <Marker
             position={userLocation}
             icon={userIcon}
@@ -459,6 +492,7 @@ const apiUrl =
             </Popup>
           </Marker>
 
+          {/* PHARMACY MARKERS */}
           {pharmacies.map((p) => (
             <Marker
               key={p.place_id}
@@ -469,31 +503,26 @@ const apiUrl =
               icon={pharmacyIcon}
             >
               <Popup>
-                <div className="min-w-[220px]">
+                <div className="min-w-[220px] text-black">
+
                   <h3 className="font-bold text-base">
                     {p.name}
                   </h3>
 
                   <p className="text-sm mt-1">
-                    {
-                      p.display_name
-                    }
+                    {p.display_name}
                   </p>
 
                   <div className="flex gap-3 mt-2 text-sm flex-wrap">
+
                     <span>
-                      📍{' '}
-                      {
-                        p.distance
-                      }
+                      📍 {p.distance}
                     </span>
 
                     <span>
-                      🚗{' '}
-                      {
-                        p.duration
-                      }
+                      🚗 {p.duration}
                     </span>
+
                   </div>
 
                   <button
@@ -508,11 +537,78 @@ const apiUrl =
                     <Navigation size={16} />
                     Directions
                   </button>
+
                 </div>
               </Popup>
             </Marker>
           ))}
         </MapContainer>
+      </div>
+
+      {/* ========================= */}
+      {/* PHARMACY LIST */}
+      {/* ========================= */}
+
+      <div className="space-y-4">
+
+        <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">
+          Nearby Pharmacies
+        </h2>
+
+        {pharmacies.length === 0 ? (
+          <div className="bg-gray-100 rounded-2xl p-6 text-gray-600">
+            No nearby pharmacies found
+          </div>
+        ) : (
+          pharmacies.map((p) => (
+            <div
+              key={p.place_id}
+              className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition duration-300"
+            >
+              <div className="flex justify-between items-start gap-4">
+
+                {/* LEFT */}
+                <div className="flex-1">
+
+                  <h3 className="text-xl font-bold text-black">
+                    {p.name}
+                  </h3>
+
+                  <p className="text-gray-600 mt-2">
+                    {p.display_name}
+                  </p>
+
+                  <div className="flex flex-wrap gap-4 mt-4 text-sm">
+
+                    <div className="bg-gray-100 px-3 py-1 rounded-full">
+                      📍 {p.distance}
+                    </div>
+
+                    <div className="bg-gray-100 px-3 py-1 rounded-full">
+                      🚗 {p.duration}
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* RIGHT */}
+                <button
+                  onClick={() => {
+                    window.open(
+                      `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}`,
+                      '_blank'
+                    );
+                  }}
+                  className="bg-blue-600 hover:bg-blue-500 px-4 py-3 rounded-xl text-white flex items-center gap-2 whitespace-nowrap"
+                >
+                  <Navigation size={18} />
+                  Directions
+                </button>
+
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
