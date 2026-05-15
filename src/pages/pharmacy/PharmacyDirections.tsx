@@ -233,35 +233,42 @@ out center;
 `;
 
         // ======================================
-        // FETCH FROM VERCEL API
+        // FETCH FROM API
         // ======================================
-        const response = await fetch(
-          '/api/overpass',
-          {
-            method: 'POST',
 
-            headers: {
-              'Content-Type':
-                'text/plain',
-            },
+const apiUrl =
+  window.location.hostname ===
+  'localhost'
+    ? 'https://overpass.kumi.systems/api/interpreter'
+    : '/api/overpass';
 
-            body: query,
-          }
-        );
+    const response = await fetch(
+      apiUrl,
+      {
+        method: 'POST',
 
-        if (!response.ok) {
-          throw new Error(
-            'Failed API request'
-          );
-        }
+        headers: {
+          'Content-Type':
+            'text/plain',
+        },
 
-        const data =
-          await response.json();
+        body: query,
+      }
+    );
 
-        console.log(
-          'OVERPASS DATA:',
-          data
-        );
+    if (!response.ok) {
+      throw new Error(
+        `API Error: ${response.status}`
+      );
+    }
+
+    const data =
+      await response.json();
+
+    console.log(
+      'OVERPASS DATA:',
+      data
+    );
 
         if (
           !data.elements ||
