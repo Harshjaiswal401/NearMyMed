@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-
+import { pharmacies as manualPharmacies } from '@/data/pharmacies';
 import {
   MapContainer,
   TileLayer,
@@ -211,219 +211,46 @@ export default function PharmacyDirections() {
   // ======================================
 
   useEffect(() => {
-    if (!userLocation) return;
+  if (!userLocation) return;
 
-    const [lat, lon] = userLocation;
+  const [lat, lon] = userLocation;
 
-    async function fetchPharmacies() {
-      try {
-        setLoading(true);
+  const enriched = manualPharmacies.map((p) => {
 
-        setError('');
+    const pharmacyLat = parseFloat(p.lat);
 
-        // 15 KM
-        const radius = 15000;
+    const pharmacyLon = parseFloat(p.lon);
 
-        // Optimized Query
-        const query = `
-[out:json][timeout:20];
+    const distance = calculateDistance(
+      lat,
+      lon,
+      pharmacyLat,
+      pharmacyLon
+    );
 
-(
-  node["amenity"="pharmacy"](around:${radius},${lat},${lon});
-  way["amenity"="pharmacy"](around:${radius},${lat},${lon});
+    return {
+      ...p,
 
-  node["shop"="chemist"](around:${radius},${lat},${lon});
-  way["shop"="chemist"](around:${radius},${lat},${lon});
-);
+      distance: `${distance.toFixed(2)} km`,
 
-out body center;
-`;
+      duration: `${Math.max(
+        2,
+        Math.round(distance * 4)
+      )} mins`,
+    };
+  });
 
-        // LOCALHOST / VERCEL
-        const apiUrl =
-          import.meta.env.DEV
-            ? 'https://overpass-api.de/api/interpreter'
-            : '/api/overpass';
-
-        const response = await fetch(
-          apiUrl,
-          {
-            method: 'POST',
-
-            headers: {
-              'Content-Type':
-                'text/plain',
-            },
-
-            body: query,
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `API Error: ${response.status}`
-          );
-        }
-
-        const data =
-          await response.json();
-
-        console.log(
-          'OVERPASS DATA:',
-          data
-        );
-
-        if (
-          !data.elements ||
-          data.elements.length === 0
-        ) {
-          setPharmacies([]);
-          return;
-        }
-
-        // ======================================
-        // REMOVE DUPLICATES
-        // ======================================
-
-        const uniquePlaces =
-          new Map();
-
-        data.elements.forEach((p: any) => {
-          const latitude =
-            p.lat || p.center?.lat;
-
-          const longitude =
-            p.lon || p.center?.lon;
-
-          if (!latitude || !longitude)
-            return;
-
-          const key =
-            p.tags?.name ||
-            `${latitude}-${longitude}`;
-
-          if (
-            !uniquePlaces.has(key)
-          ) {
-            uniquePlaces.set(key, {
-              ...p,
-              latitude,
-              longitude,
-            });
-          }
-        });
-
-        // ======================================
-        // FORMAT DATA
-        // ======================================
-
-        const enriched: Pharmacy[] = Array.from(
-  uniquePlaces.values()
-)
-  .map(
-    (
-      p: any,
-      index: number
-    ): Pharmacy | null => {
-
-      const pharmacyLat =
-        p.latitude;
-
-      const pharmacyLon =
-        p.longitude;
-
-      const distance =
-        calculateDistance(
-          lat,
-          lon,
-          pharmacyLat,
-          pharmacyLon
-        );
-
-      // FILTER > 15 KM
-      if (distance > 15)
-        return null;
-
-      return {
-        place_id:
-          p.id?.toString() ||
-          index.toString(),
-
-        name:
-          p.tags?.name ||
-          p.tags?.brand ||
-          'Medical Store',
-
-        lat: pharmacyLat.toString(),
-
-        lon: pharmacyLon.toString(),
-
-        display_name:
-          p.tags?.['addr:street'] ||
-          p.tags?.['addr:suburb'] ||
-          p.tags?.['addr:full'] ||
-          'Nearby Pharmacy',
-
-        distance: `${distance.toFixed(
-          2
-        )} km`,
-
-        duration: `${Math.max(
-          2,
-          Math.round(distance * 4)
-        )} mins`,
-      };
-    }
-  )
-
-  .filter(
-    (
-      item
-    ): item is Pharmacy => item !== null
+  enriched.sort(
+    (a, b) =>
+      Number(a.distance.replace(' km', '')) -
+      Number(b.distance.replace(' km', ''))
   );
 
-        // ======================================
-        // SORT BY DISTANCE
-        // ======================================
+  setPharmacies(enriched);
 
-        enriched.sort(
-          (
-            a: any,
-            b: any
-          ) =>
-            Number(
-              a.distance.replace(
-                ' km',
-                ''
-              )
-            ) -
-            Number(
-              b.distance.replace(
-                ' km',
-                ''
-              )
-            )
-        );
+  setLoading(false);
 
-        // LIMIT RESULTS
-        setPharmacies(
-          enriched.slice(0, 50)
-        );
-
-      } catch (err) {
-        console.error(err);
-
-        setError(
-          'Failed to fetch nearby pharmacies'
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchPharmacies();
-
-  }, [userLocation]);
+}, [userLocation]);
 
   // ======================================
   // ERROR STATE

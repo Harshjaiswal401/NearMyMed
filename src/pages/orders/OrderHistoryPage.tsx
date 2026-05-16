@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Package, Clock, CheckCircle, Truck, XCircle,
-  ChevronRight, Trash2, ShoppingCart, RotateCcw, Filter,
+  ChevronRight, Trash2,RotateCcw, Filter,
   Calendar, CreditCard, MapPin,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';

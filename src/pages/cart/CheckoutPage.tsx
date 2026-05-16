@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Truck, User, MapPin, Phone, Mail, CheckCircle, Shield, Package } from 'lucide-react';
+import { ArrowLeft, CreditCard, User, MapPin, CheckCircle, Shield } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useOrderHistory } from '../../context/OrderHistoryContext';
@@ -46,8 +46,8 @@ export default function CheckoutPage() {
     if (validate()) setStep(2);
   };
 
-const handleConfirm = () => {
-  const newOrderId = addOrder({
+const handleConfirm = async () => {
+  const newOrderId = await addOrder({
     items: items.map(i => ({ ...i })),
     subtotal: getCartTotal(),
     deliveryFee,
@@ -102,22 +102,22 @@ const sendEmails = (orderId: string) => {
   };
 
   // USER EMAIL
-  emailjs.send(
-    "service_yb3clca",
-    "template_q1zcqaq",
-    templateParams,
-    "-xTNLGloxlRg2ibDS"
-  ).then(() => {
+   emailjs.send(
+        "service_w4thywk",
+        "template_2o8a48h",
+        templateParams,
+        "7Hsq9g2XmK95QTmwu"
+      ).then(() => {
     console.log("User email sent");
   }).catch(err => console.error("User email error:", err));
 
   // ADMIN EMAIL
   emailjs.send(
-    "service_yb3clca",
-    "template_9h1ixfv",
-    templateParams,
-    "-xTNLGloxlRg2ibDS"
-  ).then(() => {
+        "service_w4thywk",
+        "template_autp1ps",
+        templateParams,
+        "7Hsq9g2XmK95QTmwu"
+      ).then(() => {
     console.log("Admin email sent");
   }).catch(err => console.error("Admin email error:", err));
 };

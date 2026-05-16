@@ -69,7 +69,7 @@ export default function OrderMorePage() {
   const handleReorder = () => {
     order.items.forEach(item => {
       addToCart({
-        id: item.id,
+        id: item.id || "",
         name: item.name,
         brand: item.brand,
         price: item.price,

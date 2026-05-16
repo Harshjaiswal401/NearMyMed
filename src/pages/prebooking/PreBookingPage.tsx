@@ -5,6 +5,13 @@ import { useTheme } from '../../context/ThemeContext';
 import { useCart } from '../../context/CartContext';
 import emailjs from "@emailjs/browser";
 import {
+  collection,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+
+import { useFirebase } from "../../context/FirebaseContext";
+import {
   useOrderHistory
 } from "../../context/OrderHistoryContext";
 
@@ -42,6 +49,7 @@ export default function PreBookingPage() {
   const { isDark } = useTheme();
   const { addToCart } = useCart();
   const navigate = useNavigate();
+  const { db } = useFirebase();
   const [step, setStep] = useState(1); // 1: select, 2: details, 3: confirmed
   const [selectedMeds, setSelectedMeds] = useState<string[]>([]);
   const [form, setForm] = useState({
@@ -149,6 +157,48 @@ export default function PreBookingPage() {
           "",
       },
     });
+    //adding order to firebase
+    await addDoc(
+  collection(db, "emergencyOrders"),
+  {
+
+    patientName:
+      form.patientName,
+
+    patientAge:
+      form.patientAge,
+
+    patientPhone:
+      form.patientPhone,
+
+    patientEmail:
+      form.patientEmail,
+
+    patientAddress:
+      form.patientAddress,
+
+    reason:
+      form.reason ===
+      "Other emergency reason"
+        ? form.customReason
+        : form.reason,
+
+    urgency:
+      form.urgency,
+
+    medicines:
+      orderedMedicines,
+
+    totalPrice,
+
+    status:
+      "pending",
+
+    createdAt:
+      serverTimestamp(),
+  }
+);
+
 
     // SEND EMAILS
     await sendEmails();
