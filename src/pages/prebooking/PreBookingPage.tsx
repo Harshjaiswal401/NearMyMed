@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, AlertTriangle, CheckCircle, MapPin, User, Phone, FileText, Zap, Package, ArrowLeft, ChevronRight } from 'lucide-react';
+import { Clock,CheckCircle,User, FileText, Zap, Package, ArrowLeft, ChevronRight } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useCart } from '../../context/CartContext';
 import emailjs from "@emailjs/browser";

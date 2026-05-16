@@ -110,6 +110,21 @@ export const pharmacies = [
   },
 
   {
+  place_id: '51',
+
+  name: 'JK Hospital',
+
+  lat: '23.2415',
+
+  lon: '77.4303',
+
+  display_name: 'JK Hospital Junction, Bhopal',
+
+  distance: '',
+
+  duration: '',
+},
+  {
     place_id: '12',
     name: 'New Bhopal Pharmacy',
     lat: '23.2801',

@@ -5,12 +5,19 @@ import { useCart } from '../../context/CartContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useOrderHistory } from '../../context/OrderHistoryContext';
 import emailjs from "@emailjs/browser";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { useFirebase } from "../../context/FirebaseContext";
 
 export default function CheckoutPage() {
   const { items, getCartTotal, getCartCount, clearCart } = useCart();
   const { isDark } = useTheme();
   const { addOrder } = useOrderHistory();
   const navigate = useNavigate();
+  const { db } = useFirebase();
   const [step, setStep] = useState(1); // 1: details, 2: confirm, 3: success
   const [form, setForm] = useState({
     fullName: '', phone: '', email: '', age: '', gender: '',
@@ -64,6 +71,46 @@ const handleConfirm = async () => {
       pinCode: form.pinCode,
     },
   });
+  await addDoc(
+  collection(db, "orders"),
+  {
+
+    orderId: newOrderId,
+
+    items: items.map(i => ({ ...i })),
+
+    subtotal: getCartTotal(),
+
+    deliveryFee,
+
+    total,
+
+    paymentMethod: form.paymentMethod,
+
+    deliveryAddress: {
+
+      fullName: form.fullName,
+
+      phone: form.phone,
+
+      email: form.email,
+
+      address1: form.address1,
+
+      address2: form.address2,
+
+      city: form.city,
+
+      state: form.state,
+
+      pinCode: form.pinCode,
+    },
+
+    status: "confirmed",
+
+    createdAt: serverTimestamp(),
+  }
+);
 
   // 🔥 ONLY THIS LINE ADDED
   sendEmails(newOrderId);
