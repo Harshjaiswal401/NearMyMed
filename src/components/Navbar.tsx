@@ -11,6 +11,7 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import { useCart } from '../context/CartContext';
 
+
 type DropdownItem = {
   label: string;
   route: string;
@@ -264,8 +265,11 @@ export default function Navbar() {
             </div>
           </Link>
 
+          
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-0.5">
+
+
             <Link
               to="/"
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all border ${
@@ -277,6 +281,11 @@ export default function Navbar() {
               <Home size={15} />
               Home
             </Link>
+
+
+            
+
+
             {navItems.map((item) => (
               <DropdownMenu key={item.id} item={item} onNavigate={() => {}} />
             ))}
