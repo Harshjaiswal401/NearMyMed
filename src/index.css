@@ -53,6 +53,14 @@ body {
 .article-track:hover {
   animation-play-state: paused;
 }
+html,
+body,
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
 
 @import "tailwindcss";
 /* index.css ya App.css ke bilkul top par */

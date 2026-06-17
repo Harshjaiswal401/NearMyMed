@@ -7,7 +7,7 @@ import AppProvider from './Context/AppContext.jsx';
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <AppProvider>
-      <App />
+      <App className="w-screen min-h-screen overflow-x-hidden" />
     </AppProvider>
     
   </BrowserRouter>

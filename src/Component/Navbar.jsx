@@ -16,6 +16,7 @@ import { useAppContext } from "../Context/AppContext.jsx";
 
 export default function Navbar() {
   const { handleNavigation } = useAppContext();
+  const { setShowLoginForm } = useAppContext();
 
   return (
     <nav className="w-full bg-white border-b border-slate-200">
@@ -75,7 +76,10 @@ export default function Navbar() {
         </button>
 
         {/* Login */}
-        <button className="px-5 py-3 rounded-xl border border-emerald-600 text-emerald-600 font-semibold hover:bg-emerald-600 hover:text-white transition">
+        <button 
+          className="px-5 py-3 rounded-xl border border-emerald-600 text-emerald-600 font-semibold hover:bg-emerald-600 hover:text-white transition"
+          onClick={() => setShowLoginForm(true)}
+        >
           Login / Sign Up
         </button>
       </div>
