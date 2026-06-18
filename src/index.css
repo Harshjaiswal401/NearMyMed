@@ -61,6 +61,20 @@ body,
   padding: 0;
   overflow-x: hidden;
 }
+@keyframes popup {
+  from {
+    opacity: 0;
+    scale: 0.8;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+.popup {
+  animation: popup .5s ease-out;
+}
 
 @import "tailwindcss";
 /* index.css ya App.css ke bilkul top par */

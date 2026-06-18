@@ -20,7 +20,9 @@ function App() {
         <div onClick={()=>setShowLoginForm(false)} className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           
         </div>
+         
         <LoginForm />
+
         </div>
       )}
       <Navbar/>

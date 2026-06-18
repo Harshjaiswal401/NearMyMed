@@ -80,9 +80,10 @@ export default function LoginForm() {
 
   return (
     
-      <div className={`absolute  w-full  z-100 max-w-sm left-1/2 -translate-x-1/2
-       top-1/2 -translate-y-1/2 ${showLoginForm ? "opacity-100" : "opacity-0"}`}>
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8">
+      <div
+       className="absolute w-full max-w-sm left-1/2 top-1/2 z-[100]
+       -translate-x-1/2 -translate-y-1/2 ">
+        <div className="bg-white border popup border-slate-200 rounded-2xl shadow-sm p-8">
           {/* Brand header, matching NearMyMed's mark */}
           <div className="mb-7 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-100">
