@@ -5,6 +5,7 @@ import FindMedicine from './pages/FindMedicine'
 import HealthLibrary from './pages/HealthLibrary'
 import NearbyPharmacies from './pages/NearbyPharmacies'
 import UploadPrescription from './pages/UploadPrescription'
+import OrderMedicines from './pages/OrderMedicines'
 // import Emergency from './pages/Emergency'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginForm from './Component/LoginForm';
@@ -32,6 +33,7 @@ function App() {
         <Route path="/health-library" element={<HealthLibrary />} />
         <Route path="/upload-prescription" element={<UploadPrescription />} />
         <Route path="/nearby-pharmacies" element={<NearbyPharmacies />} />
+        <Route path="/order-medicines" element={<OrderMedicines />} />
         {/* 
         
         <Route path="/emergency" element={<Emergency />} /> */}

@@ -9,7 +9,8 @@ import {
   Bot,
   BookOpen,
   ChevronDown,
-  House
+  House,
+  ShoppingCart
 } from "lucide-react";
 import logo from "../assets/logo.png";
 import { useAppContext } from "../Context/AppContext.jsx";
@@ -125,7 +126,7 @@ export default function Navbar() {
 
               <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-emerald-600 rounded-full transition-all duration-300 group-hover:w-full"></div>
             </div>
-
+            
             {/* Upload Prescription */}
             <div className="group relative py-4">
               <button className="flex items-center gap-2 text-slate-700 hover:text-emerald-600 transition"
@@ -133,6 +134,15 @@ export default function Navbar() {
               > 
                 <Upload size={17} />
                 Upload Prescription
+              </button>
+
+              <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-emerald-600 rounded-full transition-all duration-300 group-hover:w-full"></div>
+            </div>
+            {/* Order Medicines */}
+            <div className="group relative py-4">
+              <button className="flex items-center gap-2 text-slate-700 hover:text-emerald-600 transition" onClick={() => handleNavigation("/order-medicines")}>
+                <ShoppingCart size={17} />
+                Order Medicines
               </button>
 
               <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-emerald-600 rounded-full transition-all duration-300 group-hover:w-full"></div>
