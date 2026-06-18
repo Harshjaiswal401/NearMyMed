@@ -15,9 +15,12 @@ import logo from "../assets/logo.png";
 import { useAppContext } from "../Context/AppContext.jsx";
 
 export default function Navbar() {
+  const context = useAppContext();
+  console.log(context);
   const { handleNavigation } = useAppContext();
   const { setShowLoginForm } = useAppContext();
-
+  const { currentPage } = useAppContext();
+  console.log(currentPage);
   return (
     <nav className="w-full bg-white border-b border-slate-200">
       {/* Top Navbar */}
@@ -92,85 +95,92 @@ export default function Navbar() {
             <div className="group relative py-4">
               <button
                 onClick={() => handleNavigation("/")}
-                className="flex items-center gap-2 text-slate-700 hover:text-emerald-600 transition"
+                className={`flex items-center gap-2 ${currentPage === "/" ? "text-emerald-600" : "text-slate-700"} hover:text-emerald-600 transition`}
               >
                 <House size={17} />
                 Home
               </button>
 
-              <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-emerald-600 rounded-full transition-all duration-300 group-hover:w-full"></div>
+              <div className={`absolute bottom-0 left-0  h-[3px] bg-emerald-600
+               rounded-full ${currentPage == "/" ? "w-full" : "w-0"} transition-all duration-300 group-hover:w-full`}></div>
             </div>
             
             {/* Find Medicines */}
             <div className="group relative py-4">
               <button
                 onClick={() => handleNavigation("/find-medicines")}
-                className="flex items-center gap-2 text-emerald-600"
+                className={`flex items-center gap-2 ${currentPage === "/find-medicines" ? "text-emerald-600" : "text-slate-700"} hover:text-emerald-600 transition`}
               >
                 <Pill size={17} />
                 Find Medicines
               </button>
 
-              <div className="absolute bottom-0 left-0 w-full h-[3px] bg-emerald-600 rounded-full"></div>
+              <div className={`absolute bottom-0 left-0  h-[3px] bg-emerald-600
+               rounded-full ${currentPage === "/find-medicines" ? "w-full" : "w-0"} transition-all duration-300 group-hover:w-full`}></div>
             </div>
 
             {/* Nearby Pharmacies */}
             <div className="group relative py-4">
-              <button className="flex items-center gap-2 text-slate-700 hover:text-emerald-600 transition"
+              <button className={`flex items-center gap-2 ${currentPage === "/nearby-pharmacies" ? "text-emerald-600" : "text-slate-700"} hover:text-emerald-600 transition`}
                 onClick={() => handleNavigation("/nearby-pharmacies")}
               >
                 <Store size={17} />
                 Nearby Pharmacies
               </button>
 
-              <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-emerald-600 rounded-full transition-all duration-300 group-hover:w-full"></div>
+              <div className={`absolute bottom-0 left-0  h-[3px] bg-emerald-600
+               rounded-full ${currentPage === "/nearby-pharmacies" ? "w-full" : "w-0"} transition-all duration-300 group-hover:w-full`}></div>
             </div>
 
             {/* Upload Prescription */}
             <div className="group relative py-4">
-              <button className="flex items-center gap-2 text-slate-700 hover:text-emerald-600 transition"
+              <button className={`flex items-center gap-2 ${currentPage === "/upload-prescription" ? "text-emerald-600" : "text-slate-700"} hover:text-emerald-600 transition`}
                 onClick={() => handleNavigation("/upload-prescription")}
               > 
                 <Upload size={17} />
                 Upload Prescription
               </button>
 
-              <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-emerald-600 rounded-full transition-all duration-300 group-hover:w-full"></div>
+              <div className={`absolute bottom-0 left-0  h-[3px] bg-emerald-600
+               rounded-full ${currentPage === "/upload-prescription" ? "w-full" : "w-0"} transition-all duration-300 group-hover:w-full`}></div>
             </div>
 
             {/* AI Assistant */}
             <div className="group relative py-4">
               <button
                 onClick={() => handleNavigation("/ai-assistant")}
-                className="flex items-center gap-2 text-slate-700 hover:text-emerald-600 transition"
+                className={`flex items-center gap-2 ${currentPage === "/ai-assistant" ? "text-emerald-600" : "text-slate-700"} hover:text-emerald-600 transition`}
               >
                 <Bot size={17} />
                 AI Assistant
               </button>
 
-              <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-emerald-600 rounded-full transition-all duration-300 group-hover:w-full"></div>
+              <div className={`absolute bottom-0 left-0  h-[3px] bg-emerald-600
+               rounded-full ${currentPage === "/ai-assistant" ? "w-full" : "w-0"} transition-all duration-300 group-hover:w-full`}></div>
             </div>
 
             {/* Health Library */}
             <div className="group relative py-4">
-              <button className=" flex items-center gap-2 text-slate-700 hover:text-emerald-600 transition"
+              <button className={`flex items-center gap-2 ${currentPage === "/health-library" ? "text-emerald-600" : "text-slate-700"} hover:text-emerald-600 transition`}
                 onClick={() => handleNavigation("/health-library")}
               >
                 <BookOpen size={17} />
                 Health Library
               </button>
 
-              <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-emerald-600 rounded-full transition-all duration-300 group-hover:w-full"></div>
+              <div className={`absolute bottom-0 left-0  h-[3px] bg-emerald-600
+               rounded-full ${currentPage === "/health-library" ? "w-full" : "w-0"} transition-all duration-300 group-hover:w-full`}></div>
             </div>
 
             {/* Emergency */}
             <div className="group relative py-4 ml-auto">
-              <button className="flex items-center gap-2 text-red-500 font-semibold hover:text-red-600 transition">
+              <button className={`flex items-center gap-2 ${currentPage === "/emergency" ? "text-red-500" : "text-slate-700"} font-semibold hover:text-red-600 transition`}>
                 <ShieldAlert size={17} />
                 Emergency
               </button>
 
-              <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-red-500 rounded-full transition-all duration-300 group-hover:w-full"></div>
+              <div className={`absolute bottom-0 left-0  h-[3px] bg-red-500
+               rounded-full ${currentPage === "/emergency" ? "w-full" : "w-0"} transition-all duration-300 group-hover:w-full`}></div>
             </div>
           </div>
         </div>

@@ -11,9 +11,11 @@ export default function AppProvider({ children }) {
   const navigate = useNavigate();
 
   const [showLoginForm, setShowLoginForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState("/");
 
   function handleNavigation(path) {
     navigate(path);
+    setCurrentPage(path);
   }
 
   return (
@@ -22,6 +24,7 @@ export default function AppProvider({ children }) {
         handleNavigation,
         showLoginForm,
         setShowLoginForm,
+        currentPage,
       }}
     >
       {children}
