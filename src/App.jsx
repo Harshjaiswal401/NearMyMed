@@ -10,7 +10,7 @@ import OrderMedicines from './pages/OrderMedicines'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginForm from './Component/LoginForm';
 import Home from './pages/Home';
-import { useAppContext } from './Context/AppContext';
+import { useAppContext } from './context/AppContext';
 function App() {
   const { showLoginForm, setShowLoginForm } = useAppContext();
 
