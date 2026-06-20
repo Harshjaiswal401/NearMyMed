@@ -13,7 +13,7 @@ import {
   ShoppingCart
 } from "lucide-react";
 import logo from "../assets/logo.png";
-import { useAppContext } from "../Context/AppContext.jsx";
+import { useAppContext } from "../context/AppContext.jsx";
 
 export default function Navbar() {
   const context = useAppContext();
