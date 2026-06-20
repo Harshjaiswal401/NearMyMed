@@ -1,10 +1,10 @@
 import { Eye, EyeOff, Lock, Mail, Phone, ShieldCheck, MapPin } from "lucide-react";
-import { useAppContext } from "../Context/AppContext";
+import { useAppContext } from "../context/AppContext";
 import { useState } from "react";
 export default function LoginForm() {
   const { showLoginForm, setShowLoginForm } = useAppContext();
   // Which login method is active: "email" or "mobile"
-  const [loginMethod, setLoginMethod] = useState("email");
+  const [loginMethod, ] = useState("email");
   
   // formData holds every field across both flows in one state object
   const [formData, setFormData] = useState({
