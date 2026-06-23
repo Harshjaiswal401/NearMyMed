@@ -1,4 +1,5 @@
 
+import ArticleDetails from "./pages/ArticleDetails";
 import Navbar from './Component/Navbar'
 import AIAssistant from './pages/AIAssistant'
 import FindMedicine from './pages/FindMedicine'
@@ -36,6 +37,7 @@ function App() {
         <Route path="/upload-prescription" element={<UploadPrescription />} />
         <Route path="/nearby-pharmacies" element={<NearbyPharmacies />} />
         <Route path="/order-medicines" element={<OrderMedicines />} />
+        <Route path="/article/:id" element={<ArticleDetails />} />
         {/* 
         
         <Route path="/emergency" element={<Emergency />} /> */}

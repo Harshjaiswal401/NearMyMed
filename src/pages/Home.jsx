@@ -1,4 +1,6 @@
 
+import { Link } from "react-router-dom";
+import { articles } from "../data/articles";
 import logo from "../assets/logo.png";
 import bgImage from "../assets/near-my-med-bg.jpeg";
 import {
@@ -261,64 +263,60 @@ export default function Home() {
 
           <div className="article-track gap-6">
 
-            {[
-              ...Array(8),
-              ...Array(8), // Duplicate for smooth infinite loop
-            ].map((_, index) => (
+           <div className="article-track gap-6">
 
-              <div
-                key={index}
-                className="
-                  w-80
-                  shrink-0
-                  bg-white
-                  rounded-3xl
-                  border
-                  border-slate-200
-                  overflow-hidden
-                  hover:-translate-y-2
-                  hover:shadow-xl
-                  transition-all
-                  duration-300
-                "
-              >
+  {[...articles, ...articles].map((article, index) => (
 
-                {/* Image */}
-                <div className="h-48 bg-gradient-to-br from-emerald-100 via-teal-100 to-blue-100"></div>
+    <Link
+      to={`/article/${article.id}`}
+      key={index}
+    >
+      <div className="w-80 shrink-0 bg-white rounded-3xl border border-slate-200 overflow-hidden hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
 
-                {/* Content */}
-                <div className="p-5">
+        <img
+          src={article.image}
+          alt={article.title}
+          className="w-full h-48 object-cover"
+        />
 
-                  <span className="inline-block text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
-                    HEALTH GUIDE
-                  </span>
+        <div className="p-5">
 
-                  <h3 className="font-bold text-lg text-slate-900 mt-4">
-                    Understanding Common Fever Medicines
-                  </h3>
+          <span className="inline-block text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
+            {article.category}
+          </span>
 
-                  <p className="text-slate-500 text-sm mt-2">
-                    Learn safe usage, dosage recommendations and important precautions.
-                  </p>
+          <h3 className="font-bold text-lg text-slate-900 mt-4">
+            {article.title}
+          </h3>
 
-                  <div className="flex items-center justify-between mt-5 text-sm text-slate-400">
-                    <span>5 min read</span>
-                    <span>→</span>
-                  </div>
+          <p className="text-slate-500 text-sm mt-2">
+            {article.description}
+          </p>
 
-                </div>
+          <div className="mt-4 text-sm text-slate-500">
+            By {article.author}
+          </div>
 
-              </div>
-
-            ))}
-
+          <div className="flex items-center justify-between mt-5 text-sm text-slate-400">
+            <span>{article.readTime}</span>
+            <span>→</span>
           </div>
 
         </div>
+      </div>
+    </Link>
 
-      </section>
+  ))}
+
+</div> 
+
+ </div> {/* article-track */}
+
+  </div> {/* relative overflow-hidden */}
+
+</section>
+
       <section className="w-[90%] mx-auto mt-20">
-
   <div className="text-center mb-12 ">
 
     <span className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium">
