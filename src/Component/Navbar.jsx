@@ -15,13 +15,7 @@ import {
   X,
 } from "lucide-react";
 import logo from "../assets/logo.png";
-import { useAppContext } from "../context/AppContext.jsx";
-import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { INDIAN_CITIES, SEARCH_MOCK_DATA } from "../data/locationData.js";
-import medicinesData from "../data/medicines.js";
-
-import { useCart } from "../context/CartContext.jsx";
+import { useAppContext } from "../Context/AppContext.jsx";
 
 export default function Navbar() {
   const {
@@ -45,7 +39,7 @@ export default function Navbar() {
   const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
   const searchRef = useRef(null);
 
-// Close dropdowns on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e) => {
       if (locationRef.current && !locationRef.current.contains(e.target)) {
@@ -64,16 +58,16 @@ export default function Navbar() {
   const filtered = {
     medicines: query
       ? medicinesData
-          .filter(
-            (m) =>
-              m.brandName.toLowerCase().includes(query) ||
-              m.saltComposition.toLowerCase().includes(query)
-          )
-          .map((m) => ({ name: m.brandName, category: m.category, icon: "💊" }))
-          .slice(0, 3)
+        .filter(
+          (m) =>
+            m.brandName.toLowerCase().includes(query) ||
+            m.saltComposition.toLowerCase().includes(query)
+        )
+        .map((m) => ({ name: m.brandName, category: m.category, icon: "💊" }))
+        .slice(0, 3)
       : medicinesData
-          .map((m) => ({ name: m.brandName, category: m.category, icon: "💊" }))
-          .slice(0, 3),
+        .map((m) => ({ name: m.brandName, category: m.category, icon: "💊" }))
+        .slice(0, 3),
     diseases: query
       ? SEARCH_MOCK_DATA.diseases.filter((d) => d.name.toLowerCase().includes(query)).slice(0, 2)
       : SEARCH_MOCK_DATA.diseases.slice(0, 2),
@@ -162,11 +156,10 @@ export default function Navbar() {
                       setSelectedLocation(city.value);
                       setLocationOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition ${
-                      selectedLocation === city.value
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition ${selectedLocation === city.value
                         ? "bg-emerald-50 text-emerald-700 font-semibold"
                         : "text-slate-700 hover:bg-slate-50"
-                    }`}
+                      }`}
                   >
                     <MapPin size={13} className={selectedLocation === city.value ? "text-emerald-600" : "text-slate-400"} />
                     {city.label}
@@ -359,11 +352,10 @@ export default function Navbar() {
               <div key={path} className="group relative py-3.5 shrink-0">
                 <button
                   onClick={() => handleNav(path)}
-                  className={`flex items-center gap-1.5 transition ${
-                    currentPage === path
+                  className={`flex items-center gap-1.5 transition ${currentPage === path
                       ? "text-emerald-600"
                       : "text-slate-700"
-                  } hover:text-emerald-600`}
+                    } hover:text-emerald-600`}
                 >
                   <Icon size={15} />
                   <span>{label}</span>
@@ -374,9 +366,8 @@ export default function Navbar() {
                   )}
                 </button>
                 <div
-                  className={`absolute bottom-0 left-0 h-[3px] bg-emerald-600 rounded-full transition-all duration-300 group-hover:w-full ${
-                    currentPage === path ? "w-full" : "w-0"
-                  }`}
+                  className={`absolute bottom-0 left-0 h-[3px] bg-emerald-600 rounded-full transition-all duration-300 group-hover:w-full ${currentPage === path ? "w-full" : "w-0"
+                    }`}
                 />
               </div>
             ))}
@@ -385,19 +376,17 @@ export default function Navbar() {
             <div className="group relative py-3.5 ml-auto shrink-0">
               <button
                 onClick={() => handleNav("/emergency")}
-                className={`flex items-center gap-1.5 font-semibold transition ${
-                  currentPage === "/emergency"
+                className={`flex items-center gap-1.5 font-semibold transition ${currentPage === "/emergency"
                     ? "text-red-500"
                     : "text-slate-700"
-                } hover:text-red-600`}
+                  } hover:text-red-600`}
               >
                 <ShieldAlert size={15} />
                 Emergency
               </button>
               <div
-                className={`absolute bottom-0 left-0 h-[3px] bg-red-500 rounded-full transition-all duration-300 group-hover:w-full ${
-                  currentPage === "/emergency" ? "w-full" : "w-0"
-                }`}
+                className={`absolute bottom-0 left-0 h-[3px] bg-red-500 rounded-full transition-all duration-300 group-hover:w-full ${currentPage === "/emergency" ? "w-full" : "w-0"
+                  }`}
               />
             </div>
           </div>
@@ -432,11 +421,10 @@ export default function Navbar() {
               <button
                 key={path}
                 onClick={() => handleNav(path)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${
-                  currentPage === path
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${currentPage === path
                     ? "bg-emerald-50 text-emerald-700"
                     : "text-slate-700 hover:bg-slate-50"
-                }`}
+                  }`}
               >
                 <Icon size={18} />
                 <span className="flex-1 text-left">{label}</span>
@@ -449,11 +437,10 @@ export default function Navbar() {
             ))}
             <button
               onClick={() => handleNav("/emergency")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition ${
-                currentPage === "/emergency"
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition ${currentPage === "/emergency"
                   ? "bg-red-50 text-red-600"
                   : "text-slate-700 hover:bg-red-50 hover:text-red-600"
-              }`}
+                }`}
             >
               <ShieldAlert size={18} />
               Emergency

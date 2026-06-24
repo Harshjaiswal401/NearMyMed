@@ -10,12 +10,7 @@ import Payment from './pages/Payment';
 import { Routes, Route } from "react-router-dom";
 import LoginForm from './Component/LoginForm';
 import Home from './pages/Home';
-import { useAppContext } from './context/AppContext';
-import NotFound from './pages/NotFound';
-import CartDrawer from './Component/CartDrawer';
-import CheckoutPage from './pages/CheckoutPage';
-import OrderSuccessPage from './pages/OrderSuccessPage';
-
+import { useAppContext } from './Context/AppContext';
 function App() {
   const { showLoginForm, setShowLoginForm } = useAppContext();
 
@@ -30,10 +25,10 @@ function App() {
           <LoginForm />
         </div>
       )}
-      
+
       {/* Global Shopping Cart Drawer */}
       <CartDrawer />
-      
+
       <Navbar />
 
       <Routes>

@@ -116,22 +116,20 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={() => switchMethod("email")}
-            className={`rounded-md py-2 text-sm font-medium transition ${
-              loginMethod === "email"
+            className={`rounded-md py-2 text-sm font-medium transition ${loginMethod === "email"
                 ? "bg-white text-slate-900 shadow-sm"
                 : "text-slate-500 hover:text-slate-700"
-            }`}
+              }`}
           >
             Email
           </button>
           <button
             type="button"
             onClick={() => switchMethod("mobile")}
-            className={`rounded-md py-2 text-sm font-medium transition ${
-              loginMethod === "mobile"
+            className={`rounded-md py-2 text-sm font-medium transition ${loginMethod === "mobile"
                 ? "bg-white text-slate-900 shadow-sm"
                 : "text-slate-500 hover:text-slate-700"
-            }`}
+              }`}
           >
             Mobile OTP
           </button>
@@ -153,9 +151,8 @@ export default function LoginForm() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@gmail.com"
-                  className={`w-full rounded-lg bg-slate-50 border ${
-                    errors.email ? "border-rose-400" : "border-slate-200"
-                  } pl-10 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition`}
+                  className={`w-full rounded-lg bg-slate-50 border ${errors.email ? "border-rose-400" : "border-slate-200"
+                    } pl-10 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition`}
                 />
               </div>
               {errors.email && <p className="mt-1.5 text-xs text-rose-500">{errors.email}</p>}
@@ -174,9 +171,8 @@ export default function LoginForm() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className={`w-full rounded-lg bg-slate-50 border ${
-                    errors.password ? "border-rose-400" : "border-slate-200"
-                  } pl-10 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition`}
+                  className={`w-full rounded-lg bg-slate-50 border ${errors.password ? "border-rose-400" : "border-slate-200"
+                    } pl-10 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition`}
                 />
                 <button
                   type="button"
@@ -224,9 +220,8 @@ export default function LoginForm() {
                   onChange={handleChange}
                   disabled={otpSent}
                   placeholder="98765 43210"
-                  className={`w-full rounded-lg bg-slate-50 border ${
-                    errors.mobile ? "border-rose-400" : "border-slate-200"
-                  } pl-10 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition disabled:bg-slate-100 disabled:text-slate-500`}
+                  className={`w-full rounded-lg bg-slate-50 border ${errors.mobile ? "border-rose-400" : "border-slate-200"
+                    } pl-10 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition disabled:bg-slate-100 disabled:text-slate-500`}
                 />
               </div>
               {errors.mobile && <p className="mt-1.5 text-xs text-rose-500">{errors.mobile}</p>}
@@ -260,9 +255,8 @@ export default function LoginForm() {
                       value={formData.otp}
                       onChange={handleChange}
                       placeholder="6-digit code"
-                      className={`w-full rounded-lg bg-slate-50 border ${
-                        errors.otp ? "border-rose-400" : "border-slate-200"
-                      } pl-10 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition`}
+                      className={`w-full rounded-lg bg-slate-50 border ${errors.otp ? "border-rose-400" : "border-slate-200"
+                        } pl-10 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition`}
                     />
                   </div>
                   {errors.otp && <p className="mt-1.5 text-xs text-rose-500">{errors.otp}</p>}
