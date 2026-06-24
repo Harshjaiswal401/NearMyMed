@@ -9,7 +9,7 @@ export default function SearchMedicineBar() {
         <input
           type="text"
           placeholder="Search medicines..."
-          className="w-full outline-none"
+          className="w-full outline-none bg-transparent text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
         />
       </div>
     </div>

@@ -10,12 +10,12 @@ export default function SearchSection() {
         />
 
         <input
-          className="w-full border rounded-xl py-3 pl-11"
+          className="w-full border rounded-xl py-3 pl-11 bg-white dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-400"
           placeholder="Search pharmacy..."
         />
       </div>
 
-      <select className="col-span-3 border rounded-xl px-4">
+      <select className="col-span-3 border rounded-xl px-4 bg-white dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-400">
         <option>Within 2 km</option>
       </select>
 
