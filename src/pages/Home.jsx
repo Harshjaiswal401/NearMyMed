@@ -271,8 +271,24 @@ export default function Home() {
       to={`/article/${article.id}`}
       key={index}
     >
-      <div className="w-80 shrink-0 bg-white rounded-3xl border border-slate-200 overflow-hidden hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
-
+      <div
+  className="
+    w-80
+    h-[620px]
+    shrink-0
+    bg-emerald-600
+    rounded-3xl
+    overflow-hidden
+    text-white
+    shadow-lg
+    hover:shadow-2xl
+    hover:-translate-y-2
+    transition-all
+    duration-300
+    flex
+    flex-col
+  "
+>
         <img
           src={article.image}
           alt={article.title}
@@ -281,19 +297,30 @@ export default function Home() {
 
         <div className="p-5">
 
-          <span className="inline-block text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
+          <span className="
+inline-block
+text-xs
+font-semibold
+bg-yellow-500/20
+text-yellow-200
+px-3
+py-1
+rounded-full
+border
+border-yellow-300/30
+">
             {article.category}
           </span>
 
-          <h3 className="font-bold text-lg text-slate-900 mt-4">
+          <h3 className="font-bold text-xl text-white mt-4">
             {article.title}
           </h3>
 
-          <p className="text-slate-500 text-sm mt-2">
+          <p className="text-emerald-50 text-sm mt-2">
             {article.description}
           </p>
 
-          <div className="mt-4 text-sm text-slate-500">
+          <div className="mt-4 text-sm text-emerald-100">
             By {article.author}
           </div>
 
