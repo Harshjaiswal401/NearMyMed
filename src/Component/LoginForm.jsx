@@ -99,7 +99,7 @@ export default function LoginForm() {
 
   return (
     <div className="absolute w-full max-w-sm left-1/2 top-1/2 z-[100] -translate-x-1/2 -translate-y-1/2">
-      <div className="bg-white border popup border-slate-200 rounded-2xl shadow-xl p-8">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-8">
         {/* Brand header */}
         <div className="mb-7 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-100">
@@ -221,7 +221,7 @@ export default function LoginForm() {
                   disabled={otpSent}
                   placeholder="98765 43210"
                   className={`w-full rounded-lg bg-slate-50 border ${errors.mobile ? "border-rose-400" : "border-slate-200"
-                    } pl-10 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition disabled:bg-slate-100 disabled:text-slate-500`}
+                    } pl-10 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition disabled:bg-slate-100 disabled:cursor-not-allowed`}
                 />
               </div>
               {errors.mobile && <p className="mt-1.5 text-xs text-rose-500">{errors.mobile}</p>}
@@ -293,7 +293,7 @@ export default function LoginForm() {
           className="w-full flex items-center justify-center gap-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm font-medium text-slate-700 py-2.5 transition"
         >
           <svg className="h-4 w-4" viewBox="0 0 48 48">
-            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z" />
+            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11.1 0 20-8.9 20-20 0-1.3-.1-2.7-.4-3.5z" />
             <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
             <path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.8 14-4.9l-6.5-5.4C29.6 35.4 27 36 24 36c-5.3 0-9.7-3.1-11.3-7.6l-6.5 5C9.6 39.6 16.2 44 24 44z" />
             <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.5 5.4C41.5 35.9 44 30.5 44 24c0-1.3-.1-2.7-.4-3.5z" />
