@@ -149,7 +149,12 @@ export default function HealthLibrary() {
               {trending.map((item) => (
                 <button
                   key={item}
-                  className="px-4 py-2 bg-white border border-emerald-200 rounded-full text-sm font-medium hover:bg-emerald-50 transition"
+                  onClick={() => setSearch(item)}
+                  className={`px-4 py-2 border rounded-full text-sm font-medium transition ${
+                    search === item
+                      ? "bg-emerald-600 border-emerald-600 text-white"
+                      : "bg-white border-emerald-200 hover:bg-emerald-50"
+                  }`}
                 >
                   {item}
                 </button>

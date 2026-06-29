@@ -1,24 +1,25 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useAppContext } from "../context/AppContext";
+import allPharmacies from "../data/pharmacies";
 
-// ── User location (Bhopal city centre as origin) ──────────────────────────────
-const USER = { lat: 23.2599, lng: 77.4126 };
-
-const MEDICINE_SUGGESTIONS = [
-  "Paracetamol 500mg","Paracetamol 650mg","Dolo 650","Crocin","Aspirin 75mg",
-  "Ibuprofen 400mg","Pantoprazole 40mg","Azithromycin 500mg","Amoxicillin 500mg",
-  "Cetirizine 10mg","Metformin 500mg","Atorvastatin 10mg","Omeprazole 20mg",
-  "Vitamin D3","Vitamin B12","Calcium Carbonate","Montelukast 10mg",
-  "Amlodipine 5mg","Losartan 50mg","Ciprofloxacin 500mg",
-];
-
-// Each pharmacy has real lat/lng so we can compute actual inter-pharmacy distance
-const PHARMACIES = [
-  { id:1, name:"MedPlus Pharmacy",    address:"Shop 12, Arera Colony, Bhopal",   lat:23.2489, lng:77.4012, open:true,  rating:4.5, icon:"🏥" },
-  { id:2, name:"Apollo Pharmacy",     address:"MP Nagar Zone II, Bhopal",         lat:23.2331, lng:77.4272, open:true,  rating:4.7, icon:"💊" },
-  { id:3, name:"City Medical Store",  address:"New Market, T.T. Nagar, Bhopal",  lat:23.2686, lng:77.4008, open:true,  rating:4.2, icon:"🏪" },
-  { id:4, name:"Jan Aushadhi Kendra", address:"Habibganj, Bhopal",                lat:23.2311, lng:77.4340, open:false, rating:4.0, icon:"🌿" },
-  { id:5, name:"LifeCare Pharmacy",   address:"Kolar Road, Bhopal",               lat:23.2104, lng:77.4680, open:true,  rating:4.3, icon:"❤️" },
-];
+// User coordinates are approximated from city centres when location changes
+const CITY_COORDS = {
+  Bhopal:    { lat: 23.2599, lng: 77.4126 },
+  Indore:    { lat: 22.7196, lng: 75.8577 },
+  Delhi:     { lat: 28.6315, lng: 77.2167 },
+  Mumbai:    { lat: 19.0760, lng: 72.8777 },
+  Bangalore: { lat: 12.9716, lng: 77.5946 },
+  Hyderabad: { lat: 17.3850, lng: 78.4867 },
+  Chennai:   { lat: 13.0827, lng: 80.2707 },
+  Pune:      { lat: 18.5204, lng: 73.8567 },
+  Kolkata:   { lat: 22.5726, lng: 88.3639 },
+  Ahmedabad: { lat: 23.0225, lng: 72.5714 },
+  Jaipur:    { lat: 26.9124, lng: 75.7873 },
+  Lucknow:   { lat: 26.8467, lng: 80.9462 },
+  Surat:     { lat: 21.1702, lng: 72.8311 },
+  Nagpur:    { lat: 21.1458, lng: 79.0882 },
+  Chandigarh:{ lat: 30.7333, lng: 76.7794 },
+};
 
 // ── Haversine distance (km) between two lat/lng points ────────────────────────
 function haversine(a, b) {
@@ -34,19 +35,19 @@ function haversine(a, b) {
 }
 
 // ── Route cost: User→P1→P2→…→User (round trip through ordered stops) ─────────
-function routeCost(pharmacyList) {
-  const stops = [USER, ...pharmacyList, USER];
+function routeCost(pharmacyList, user) {
+  const stops = [user, ...pharmacyList, user];
   let total = 0;
   for (let i = 0; i < stops.length - 1; i++) total += haversine(stops[i], stops[i + 1]);
   return parseFloat(total.toFixed(2));
 }
 
 // ── Optimal stop order for a combo (TSP nearest-neighbour for ≤3 stops) ──────
-function bestOrder(pharmacies) {
+function bestOrder(pharmacies, user) {
   if (pharmacies.length === 1) return pharmacies;
   if (pharmacies.length === 2) {
-    const ab = routeCost([pharmacies[0], pharmacies[1]]);
-    const ba = routeCost([pharmacies[1], pharmacies[0]]);
+    const ab = routeCost([pharmacies[0], pharmacies[1]], user);
+    const ba = routeCost([pharmacies[1], pharmacies[0]], user);
     return ab <= ba ? pharmacies : [pharmacies[1], pharmacies[0]];
   }
   // 3 pharmacies: try all 6 permutations
@@ -56,15 +57,15 @@ function bestOrder(pharmacies) {
   let best = null, bestCost = Infinity;
   perms.forEach(([a,b,c]) => {
     const order = [pharmacies[a], pharmacies[b], pharmacies[c]];
-    const cost = routeCost(order);
+    const cost = routeCost(order, user);
     if (cost < bestCost) { bestCost = cost; best = order; }
   });
   return best;
 }
 
 // ── Generate mock availability ─────────────────────────────────────────────────
-function generateAvailability(medicines) {
-  return PHARMACIES.map((pharmacy) => {
+function generateAvailability(medicines, pharmacies, user) {
+  return pharmacies.map((pharmacy) => {
     const availability = {};
     medicines.forEach((med) => {
       const r = Math.random();
@@ -72,7 +73,7 @@ function generateAvailability(medicines) {
     });
     const inStockCount = medicines.filter((m) => availability[m] === "in-stock").length;
     const score = inStockCount === medicines.length ? 3 : inStockCount > 0 ? 2 : 1;
-    const distanceFromUser = haversine(USER, pharmacy);
+    const distanceFromUser = haversine(user, pharmacy);
     // Single-pharmacy round-trip cost: User → P → User
     const singleTripCost = parseFloat((distanceFromUser * 2).toFixed(2));
     return { ...pharmacy, availability, inStockCount, score, distanceFromUser, singleTripCost };
@@ -80,7 +81,7 @@ function generateAvailability(medicines) {
 }
 
 // ── Find combos that cover all medicines, compute true route cost ──────────────
-function findCombinations(results, medicines) {
+function findCombinations(results, medicines, user) {
   const covers = (p, med) => p.availability[med] !== "out-of-stock";
   const coversAll = (arr) => medicines.every((med) => arr.some((p) => covers(p, med)));
   const aloneCoversAll = (p) => medicines.every((m) => covers(p, m));
@@ -94,8 +95,8 @@ function findCombinations(results, medicines) {
       if (!coversAll(pair)) continue;
       if (aloneCoversAll(results[i]) || aloneCoversAll(results[j])) continue;
 
-      const ordered = bestOrder(pair);
-      const tripCost = routeCost(ordered);
+      const ordered = bestOrder(pair, user);
+      const tripCost = routeCost(ordered, user);
 
       const assignment = {};
       medicines.forEach((med) => {
@@ -103,9 +104,9 @@ function findCombinations(results, medicines) {
       });
 
       const legs = [
-        { from:"You", to:ordered[0].name, dist: haversine(USER, ordered[0]) },
+        { from:"You", to:ordered[0].name, dist: haversine(user, ordered[0]) },
         { from:ordered[0].name, to:ordered[1].name, dist: haversine(ordered[0], ordered[1]) },
-        { from:ordered[1].name, to:"Home", dist: haversine(ordered[1], USER) },
+        { from:ordered[1].name, to:"Home", dist: haversine(ordered[1], user) },
       ];
 
       combos.push({ pharmacies: ordered, tripCost, assignment, legs });
@@ -120,8 +121,8 @@ function findCombinations(results, medicines) {
           const trio = [results[i], results[j], results[k]];
           if (!coversAll(trio)) continue;
 
-          const ordered = bestOrder(trio);
-          const tripCost = routeCost(ordered);
+          const ordered = bestOrder(trio, user);
+          const tripCost = routeCost(ordered, user);
 
           const assignment = {};
           medicines.forEach((med) => {
@@ -129,10 +130,10 @@ function findCombinations(results, medicines) {
           });
 
           const legs = [
-            { from:"You", to:ordered[0].name, dist: haversine(USER, ordered[0]) },
+            { from:"You", to:ordered[0].name, dist: haversine(user, ordered[0]) },
             { from:ordered[0].name, to:ordered[1].name, dist: haversine(ordered[0], ordered[1]) },
             { from:ordered[1].name, to:ordered[2].name, dist: haversine(ordered[1], ordered[2]) },
-            { from:ordered[2].name, to:"Home", dist: haversine(ordered[2], USER) },
+            { from:ordered[2].name, to:"Home", dist: haversine(ordered[2], user) },
           ];
 
           combos.push({ pharmacies: ordered, tripCost, assignment, legs });
@@ -219,8 +220,37 @@ function RouteLegs({ legs }) {
   );
 }
 
+const MEDICINE_SUGGESTIONS = [
+  "Paracetamol 500mg","Paracetamol 650mg","Dolo 650","Crocin","Aspirin 75mg",
+  "Ibuprofen 400mg","Pantoprazole 40mg","Azithromycin 500mg","Amoxicillin 500mg",
+  "Cetirizine 10mg","Metformin 500mg","Atorvastatin 10mg","Omeprazole 20mg",
+  "Vitamin D3","Vitamin B12","Calcium Carbonate","Montelukast 10mg",
+  "Amlodipine 5mg","Losartan 50mg","Ciprofloxacin 500mg",
+];
+
+const PHARMACY_ICONS = ["🏥","💊","🏪","🌿","❤️","🔬","💉","🌡️"];
+
 // ── Main component ─────────────────────────────────────────────────────────────
 export default function FindMedicine() {
+  const { selectedLocation } = useAppContext();
+
+  // Derive USER coords and PHARMACIES from selected city
+  const USER = CITY_COORDS[selectedLocation] ?? CITY_COORDS.Bhopal;
+  const PHARMACIES = useMemo(() => {
+    const cityPharmacies = allPharmacies.filter((p) => p.city === selectedLocation);
+    // Take up to 8 for display; map to the shape FindMedicine expects
+    return cityPharmacies.slice(0, 8).map((p, i) => ({
+      id: p.id,
+      name: p.name,
+      address: p.address,
+      lat: p.lat,
+      lng: p.lng,
+      open: p.isOpen,
+      rating: p.rating,
+      icon: PHARMACY_ICONS[i % PHARMACY_ICONS.length],
+    }));
+  }, [selectedLocation]);
+
   const [query, setQuery]               = useState("");
   const [suggestions, setSuggestions]   = useState([]);
   const [medicineList, setMedicineList] = useState([]);
@@ -228,9 +258,12 @@ export default function FindMedicine() {
   const [loading, setLoading]           = useState(false);
   const [activeIdx, setActiveIdx]       = useState(-1);
   const [availFilter, setAvailFilter]   = useState("all");
-  const [sortBy, setSortBy]             = useState("tripcost"); // "tripcost" | "availability" | "distance"
+  const [sortBy, setSortBy]             = useState("tripcost");
   const inputRef    = useRef(null);
   const dropdownRef = useRef(null);
+
+  // Reset results when city changes
+  useEffect(() => { setResults(null); setMedicineList([]); }, [selectedLocation]);
 
   useEffect(() => {
     if (query.trim().length < 1) { setSuggestions([]); return; }
@@ -270,10 +303,10 @@ export default function FindMedicine() {
   const handleSearch = () => {
     if (!medicineList.length) return;
     setLoading(true); setResults(null);
-    setTimeout(() => { setResults(generateAvailability(medicineList)); setLoading(false); }, 1200);
+    setTimeout(() => { setResults(generateAvailability(medicineList, PHARMACIES, USER)); setLoading(false); }, 1200);
   };
 
-  const combos   = results && medicineList.length > 1 ? findCombinations(results, medicineList) : [];
+  const combos = results && medicineList.length > 1 ? findCombinations(results, medicineList, USER) : [];
 
   const displayResults = results
     ? [...results]
