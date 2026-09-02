@@ -1,4 +1,4 @@
-import { medicines } from "../../data/medicines";
+import   medicines  from "../../data/medicines";
 import MedicineCard from "./MedicineCard";
 
 export default function MedicineGrid() {

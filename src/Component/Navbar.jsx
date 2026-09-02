@@ -15,7 +15,12 @@ import {
   X,
 } from "lucide-react";
 import logo from "../assets/logo.png";
-import { useAppContext } from "../Context/AppContext.jsx";
+import { useAppContext } from "../context/AppContext.jsx";
+import { useCart } from "../context/CartContext.jsx";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import medicinesData from "../data/medicines.js";
+import { SEARCH_MOCK_DATA, INDIAN_CITIES } from "../data/locationData.js";
 
 export default function Navbar() {
   const {

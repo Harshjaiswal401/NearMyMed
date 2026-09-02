@@ -4,7 +4,7 @@ const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
-export const CartProvider = ({ children }) => {
+export default function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
 

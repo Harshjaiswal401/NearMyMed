@@ -4,24 +4,17 @@ import FindMedicine from './pages/FindMedicine';
 import HealthLibrary from './pages/HealthLibrary';
 import NearbyPharmacies from './pages/NearbyPharmacies';
 import UploadPrescriptionPage from './pages/UploadPrescriptionPage';
-import OrderMedicinesPage from './pages/OrderMedicinesPage';
-import Emergency from './pages/Emergency';
 import Payment from './pages/Payment';
-import { Routes, Route } from "react-router-dom";
-
 import ArticleDetails from "./pages/ArticleDetails";
-import Navbar from './Component/Navbar'
-import AIAssistant from './pages/AIAssistant'
-import FindMedicine from './pages/FindMedicine'
-import HealthLibrary from './pages/HealthLibrary'
-import NearbyPharmacies from './pages/NearbyPharmacies'
-import UploadPrescription from './pages/UploadPrescription'
-import OrderMedicines from './pages/OrderMedicines'
-// import Emergency from './pages/Emergency'
+import CartDrawer from './Component/CartDrawer';
+import CheckoutPage from './pages/CheckoutPage';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import OrderMedicinesPage from './pages/OrderMedicinesPage';
 import LoginForm from './Component/LoginForm';
 import Home from './pages/Home';
-import { useAppContext } from './Context/AppContext';
+import OrderSuccessPage from './pages/OrderSuccessPage';
+import { useAppContext } from './context/AppContext';
+import Emergencey from './pages/Emergency';
 function App() {
   const { showLoginForm, setShowLoginForm } = useAppContext();
 
@@ -49,8 +42,12 @@ function App() {
         <Route path="/health-library" element={<HealthLibrary />} />
         <Route path="/upload-prescription" element={<UploadPrescriptionPage />} />
         <Route path="/nearby-pharmacies" element={<NearbyPharmacies />} />
-        <Route path="/order-medicines" element={<OrderMedicines />} />
+        <Route path="/order-medicines" element={<OrderMedicinesPage />} />
         <Route path="/article/:id" element={<ArticleDetails />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-success" element={<OrderSuccessPage />} />
+        <Route path="/emergency" element={<Emergencey />} />
+        <Route path="/payment" element={<Payment />} />
         {/* 
         
         <Route path="/emergency" element={<Emergency />} /> */}
