@@ -560,7 +560,8 @@ export default function UploadPrescriptionPage() {
 
               <div className="bg-amber-50/50 border border-amber-100 rounded-2xl p-4 flex gap-3 text-[11px] text-amber-700 leading-relaxed font-medium">
                 <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
-                We do not dispense Schedule H1 / X drugs (e.g. strong narcotics/psychotropics) without strict manual vetting.
+                  *We do not dispense Schedule H1 / X drugs (e.g. strong narcotics/psychotropics) without strict manual vetting.               
+                  (You are solely responsible for ensuring that your orders comply with all applicable guidelines.)
               </div>
 
             </div>
