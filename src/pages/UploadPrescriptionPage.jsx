@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 export default function UploadPrescriptionPage() {
+  const [isVerified, setIsVerified] = useState(false);
   // State variables
   const [file, setFile] = useState(null);
   const [isDragActive, setIsDragActive] = useState(false);
@@ -422,7 +423,35 @@ export default function UploadPrescriptionPage() {
                     className="w-full bg-slate-50/50 focus:bg-white border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none rounded-xl px-4 py-3 text-sm transition resize-none"
                   ></textarea>
                 </div>
+{/* Prescription Verification */}
+<div className="col-span-2">
+  <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl">
 
+    <input
+      type="checkbox"
+      checked={isVerified}
+      onChange={(e) => setIsVerified(e.target.checked)}
+      className="mt-1 w-5 h-5 accent-emerald-600 cursor-pointer"
+    />
+
+    <div>
+      <div className="flex items-center gap-2">
+        <ShieldCheck size={20} className="text-emerald-600" />
+
+        <span className="font-bold text-slate-800">
+          I Verify
+        </span>
+      </div>
+
+      <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+        I verify that I have uploaded a genuine prescription
+        issued by a valid, licensed doctor and that it is
+        intended for the medicine(s) I am searching for.
+      </p>
+    </div>
+
+  </div>
+</div>
               </div>
 
               {/* Submission Logic & States */}
@@ -473,7 +502,7 @@ export default function UploadPrescriptionPage() {
                 {uploadStatus !== "success" && (
                   <button
                     type="submit"
-                    disabled={!file || uploadStatus === "uploading" || uploadStatus === "parsing"}
+                    disabled={!file || !isVerified || uploadStatus === "uploading" || uploadStatus === "parsing"}
                     className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-600/10 hover:shadow-emerald-600/20 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.99]"
                   >
                     Upload & Continue
