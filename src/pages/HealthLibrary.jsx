@@ -11,11 +11,16 @@ import {
   Brain,
   Apple,
   Stethoscope,
+  X,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 
 export default function HealthLibrary() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [expandedSections, setExpandedSections] = useState({});
 
   const libraryData = [
     {
@@ -366,6 +371,162 @@ export default function HealthLibrary() {
     { name: "Health Guides", icon: BookOpen },
   ];
 
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  const DetailModal = ({ item, onClose }) => {
+    if (!item) return null;
+
+    const Icon = item.icon;
+    const detailEntries = Object.entries(item.details).filter(
+      ([_, value]) => value && (Array.isArray(value) ? value.length > 0 : value !== "")
+    );
+
+    const getSectionLabel = (key) => {
+      const labels = {
+        overview: "📋 Overview",
+        symptoms: "🤒 Symptoms",
+        causes: "🔍 Causes",
+        treatment: "💊 Treatment",
+        prevention: "🛡️ Prevention",
+        types: "📊 Types",
+        homeRemedy: "🏥 Home Remedies",
+        whenToSeek: "⚠️ When to Seek Help",
+        dosage: "⏰ Dosage",
+        maxDaily: "📍 Maximum Daily Dose",
+        uses: "✅ Uses",
+        sideEffects: "⚠️ Side Effects",
+        interactions: "🔗 Drug Interactions",
+        warnings: "⛔ Warnings",
+        investigation: "🔬 Investigation",
+        strategies: "🎯 Strategies",
+        stressManagement: "😌 Stress Management",
+        anxiety: "😰 Anxiety Relief",
+        depression: "💔 Depression Support",
+        resources: "📞 Resources",
+        bestPractices: "✨ Best Practices",
+        avoid: "❌ Avoid These",
+        techniques: "🧘 Techniques",
+        duration: "⏱️ Sleep Duration",
+        physicalActivities: "🏃 Physical Activities",
+        mindfulness: "🧠 Mindfulness",
+        lifestyle: "🌟 Lifestyle Changes",
+        professional: "👨‍⚕️ Professional Help",
+        emergency: "🚨 Emergency",
+        foodGroups: "🍽️ Food Groups",
+        servings: "🥗 Daily Servings",
+        proteins: "🍗 Protein Sources",
+        hydration: "💧 Hydration",
+        principles: "🎯 Principles",
+        diet: "🥘 Diet Options",
+        exercise: "💪 Exercise Plan",
+        monitoring: "📊 Monitoring",
+        support: "🤝 Support",
+        vitaminD: "☀️ Vitamin D",
+        vitaminC: "🍊 Vitamin C",
+        iron: "⚔️ Iron",
+        calcium: "🥛 Calcium",
+        zinc: "✨ Zinc",
+        vaccinations: "💉 Vaccinations",
+        screenings: "🔍 Screenings",
+        lifestyle: "🌱 Lifestyle",
+        checkups: "🏥 Checkups",
+        cpr: "❤️ CPR",
+        bleeding: "🩸 Bleeding",
+        burns: "🔥 Burns",
+        choking: "😵 Choking",
+        allergies: "🦟 Allergies",
+        cardio: "🏃 Cardio",
+        strength: "💪 Strength",
+        flexibility: "🤸 Flexibility",
+        beginners: "🌱 For Beginners",
+        benefits: "🌟 Benefits",
+      };
+      return labels[key] || key.charAt(0).toUpperCase() + key.slice(1);
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+          {/* Header */}
+          <div className="sticky top-0 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-t-3xl p-6 flex items-start justify-between">
+            <div className="flex items-start gap-4">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+                <Icon size={32} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold">{item.title}</h2>
+                <p className="text-emerald-100 mt-1">{item.type}</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/20 rounded-full transition"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="p-6 space-y-4">
+            {detailEntries.map(([key, value], index) => (
+              <div key={key} className="border border-emerald-100 rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => toggleSection(key)}
+                  className="w-full flex items-center justify-between bg-gradient-to-r from-emerald-50 to-green-50 p-4 hover:from-emerald-100 hover:to-green-100 transition"
+                >
+                  <span className="font-semibold text-slate-900 text-lg">
+                    {getSectionLabel(key)}
+                  </span>
+                  <ChevronDown
+                    size={20}
+                    className={`text-emerald-600 transition ${
+                      expandedSections[key] ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {expandedSections[key] && (
+                  <div className="bg-white p-4 border-t border-emerald-100">
+                    {typeof value === "string" ? (
+                      <p className="text-slate-700 leading-relaxed">{value}</p>
+                    ) : Array.isArray(value) ? (
+                      <ul className="space-y-2">
+                        {value.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            <Check size={18} className="text-emerald-600 mt-1 flex-shrink-0" />
+                            <span className="text-slate-700">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div className="sticky bottom-0 bg-emerald-50 border-t border-emerald-200 p-4 flex gap-3 justify-center rounded-b-3xl">
+            <button
+              onClick={onClose}
+              className="px-6 py-2 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition"
+            >
+              Close
+            </button>
+            <button className="px-6 py-2 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-xl hover:bg-emerald-50 transition">
+              Save to Favorites
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-100">
       {/* HERO */}
@@ -584,7 +745,10 @@ export default function HealthLibrary() {
                     )}
                   </div>
 
-                  <button className="mt-5 flex items-center gap-2 text-emerald-600 font-semibold hover:text-emerald-700 transition">
+                  <button
+                    onClick={() => setSelectedItem(item)}
+                    className="mt-5 flex items-center gap-2 text-emerald-600 font-semibold hover:text-emerald-700 transition"
+                  >
                     View Details
                     <ArrowRight size={18} />
                   </button>
@@ -625,6 +789,9 @@ export default function HealthLibrary() {
           </button>
         </div>
       </section>
+
+      {/* Detail Modal */}
+      <DetailModal item={selectedItem} onClose={() => setSelectedItem(null)} />
     </div>
   );
 }
